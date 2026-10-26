@@ -83,7 +83,11 @@ main{padding:1.5rem;max-width:1200px;margin:0 auto}
 .product-card:hover{transform:translateY(-5px);box-shadow:0 12px 30px rgba(0,180,255,.2);border-color:var(--blue)}
 .product-card img{width:100%;height:200px;object-fit:contain;background:#0a1628}
 .product-card .info{padding:1rem;flex:1;display:flex;flex-direction:column}
-.product-card h3{font-size:1.1rem;margin-bottom:.4rem;color:var(--accent)}
+.product-card h3{font-size:1.1rem;margin-bottom:.2rem;color:var(--accent)}
+.product-card .codigo{font-size:.8rem;color:var(--blue);margin-bottom:.4rem;font-weight:600}
+.admin-row{display:flex;gap:.6rem;flex-wrap:wrap}
+.admin-row input#prodName{flex:1;min-width:120px;max-width:55%}
+.admin-row input#prodCodigo{width:140px;flex:0 0 140px}
 .product-card .desc{font-size:.85rem;color:var(--muted);flex:1;margin-bottom:.8rem}
 .product-card .agotado{background:var(--danger);color:#fff;padding:.3rem .6rem;border-radius:6px;font-size:.8rem;display:inline-block;margin-bottom:.5rem}
 .product-card .add-btn{width:100%;margin-top:auto}
@@ -239,7 +243,10 @@ nav{width:100%;justify-content:center;flex-wrap:wrap}
       <div id="productsAdminList"></div>
       <h4>Agregar / Editar Producto</h4>
       <input type="hidden" id="editProdId">
-      <input type="text" id="prodName" placeholder="Nombre">
+      <div class="admin-row">
+        <input type="text" id="prodName" placeholder="Nombre">
+        <input type="text" id="prodCodigo" placeholder="Código ID">
+      </div>
       <select id="prodCat">
         <option value="cuartos">Cuartos Fríos</option>
         <option value="exhibidoras">Neveras Exhibidoras</option>
@@ -417,6 +424,7 @@ function renderProducts(){
       <img src="${p.img}" alt="${p.name}" onerror="this.src='images/logo.png'">
       <div class="info">
         <h3>${p.name}</h3>
+        ${p.codigo?`<p class="codigo">ID: ${p.codigo}</p>`:''}
         ${!p.available?'<span class="agotado">AGOTADO</span>':''}
         <p class="desc">${p.desc||""}</p>
         <button class="btn primary add-btn pulse-add" ${!p.available?'disabled style="opacity:.5"':''} onclick="addToCart(${p.id})">${p.available?"Agregar al Carrito":"No disponible"}</button>
@@ -538,7 +546,7 @@ async function deleteGallery(id){
 function renderProductsAdmin(){
   document.getElementById("productsAdminList").innerHTML=data.products.map(p=>`
     <div class="admin-item"><img src="${p.img}" onerror="this.src='images/logo.png'">
-    <div><strong>${p.name}</strong><br><small>${p.cat} | ${p.available?"Disponible":"Agotado"}</small></div>
+    <div><strong>${p.name}</strong>${p.codigo?` <small style="color:var(--blue)">[${p.codigo}]</small>`:""}<br><small>${p.cat} | ${p.available?"Disponible":"Agotado"}</small></div>
     <div class="actions"><button class="btn primary" onclick="editProduct(${p.id})">Editar</button>
     <button class="btn secondary" onclick="deleteProduct(${p.id})">Borrar</button></div></div>`).join("");
 }
@@ -551,15 +559,17 @@ document.getElementById("prodDesc")?.addEventListener("input",()=>updateProdPrev
 
 function updateProdPreview(imgSrc){
   const name=document.getElementById("prodName").value||"Nombre";
+  const codigo=document.getElementById("prodCodigo").value||"";
   const desc=document.getElementById("prodDesc").value||"";
   const img=imgSrc||(editingProdId?data.products.find(p=>p.id===editingProdId)?.img:"images/logo.png");
-  document.getElementById("previewProd").innerHTML=`<img src="${img}" style="max-height:120px"><h4>${name}</h4><p style="font-size:.85rem;color:var(--muted)">${desc.substring(0,100)}</p>`;
+  document.getElementById("previewProd").innerHTML=`<img src="${img}" style="max-height:120px"><h4>${name}</h4>${codigo?`<p style="color:var(--blue);font-size:.85rem">ID: ${codigo}</p>`:""}<p style="font-size:.85rem;color:var(--muted)">${desc.substring(0,100)}</p>`;
 }
 
 function editProduct(id){
   const p=data.products.find(x=>x.id===id);if(!p)return;
   editingProdId=id;
   document.getElementById("prodName").value=p.name;
+  document.getElementById("prodCodigo").value=p.codigo||"";
   document.getElementById("prodCat").value=p.cat;
   document.getElementById("prodDesc").value=p.desc||"";
   document.getElementById("prodStock").checked=!!p.available;
@@ -571,6 +581,7 @@ function editProduct(id){
 
 async function saveProduct(){
   const name=document.getElementById("prodName").value.trim();
+  const codigo=document.getElementById("prodCodigo").value.trim();
   const cat=document.getElementById("prodCat").value;
   const desc=document.getElementById("prodDesc").value.trim();
   const available=document.getElementById("prodStock").checked;
@@ -582,7 +593,7 @@ async function saveProduct(){
     let img=editingProdId?(data.products.find(p=>p.id===id)?.img||""):"";
     if(file)img=await uploadImage(file,`products/${id}_${file.name}`);
     if(!img)img="images/logo.png";
-    const prod={id,name,cat,desc,img,available};
+    const prod={id,name,codigo,cat,desc,img,available};
     await db.ref("products/"+id).set(prod);
     const i=data.products.findIndex(p=>p.id===id);
     if(i>=0)data.products[i]=prod;else data.products.unshift(prod);
@@ -594,6 +605,7 @@ async function saveProduct(){
 function clearProdForm(){
   editingProdId=null;
   document.getElementById("prodName").value="";
+  document.getElementById("prodCodigo").value="";
   document.getElementById("prodDesc").value="";
   document.getElementById("prodImg").value="";
   document.getElementById("prodStock").checked=true;
