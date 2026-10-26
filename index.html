@@ -375,7 +375,7 @@ async function importFromControlJSON(){
         const id = found.id;
         let img = found.img||'';
         if(imgData){
-          try{ img = await uploadImageDataUrl(imgData, 'products/import_'+id+'_'+Date.now()+'.jpg'); }
+          try{ img = await uploadImageDataUrl(imgData, 'products/import_'+id+'_'+Date.now()+((imgData.indexOf('image/png')>=0)?'.png':'.jpg')); }
           catch(e){ console.warn('img', e); }
         }
         const prod = {
@@ -395,7 +395,7 @@ async function importFromControlJSON(){
         const id = Date.now()+i;
         let img = 'images/logo.png';
         if(imgData){
-          try{ img = await uploadImageDataUrl(imgData, 'products/import_'+id+'.jpg'); }
+          try{ img = await uploadImageDataUrl(imgData, 'products/import_'+id+((imgData.indexOf('image/png')>=0)?'.png':'.jpg')); }
           catch(e){ console.warn('img', e); }
         }
         const prod = {
