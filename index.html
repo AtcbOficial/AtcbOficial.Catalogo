@@ -340,27 +340,33 @@ let slideTimers = [];
 function showLoading(on){document.getElementById("fbLoading").style.display=on?"flex":"none"}
 
 
-/** Sube dataURL (base64) a Storage y devuelve URL de descarga */
-async function uploadImageDataUrl(dataUrl, path){
+/** Sube dataURL a Storage con timeout; si falla, devuelve "" */
+async function uploadImageDataUrl(dataUrl, path, timeoutMs){
   if(!dataUrl || dataUrl.indexOf('data:image')!==0) return "";
-  const res = await fetch(dataUrl);
-  const blob = await res.blob();
-  const ref = storage.ref(path);
-  await ref.put(blob);
-  return await ref.getDownloadURL();
+  const ms = timeoutMs || 12000;
+  const work = (async () => {
+    const res = await fetch(dataUrl);
+    const blob = await res.blob();
+    const ref = storage.ref(path);
+    await ref.put(blob);
+    return await ref.getDownloadURL();
+  })();
+  const timeout = new Promise((_, rej) => setTimeout(() => rej(new Error('Storage timeout')), ms));
+  return Promise.race([work, timeout]);
 }
 function normCodigo(c){ return String(c||'').trim().toLowerCase(); }
+/** Import desde Control: igual de rápido que perfumes (img en RTDB; Storage opcional) */
 async function importFromControlJSON(){
   const input = document.getElementById('importControlFile');
   const st = document.getElementById('importControlStatus');
   const setSt = (t) => { if(st) st.textContent = t; };
   if(!input || !input.files || !input.files[0]){ alert('Elige el archivo JSON exportado desde Control'); return; }
-  showLoading(true);
+  // No bloquear toda la UI con "Cargando..."; solo el estado del import
   try{
     const textJson = await input.files[0].text();
     const dataIn = JSON.parse(textJson);
     const items = Array.isArray(dataIn.items) ? dataIn.items : (Array.isArray(dataIn) ? dataIn : []);
-    if(!items.length){ alert('El JSON no trae productos (items)'); showLoading(false); return; }
+    if(!items.length){ alert('El JSON no trae productos (items)'); return; }
     let created=0, updated=0, skipped=0;
     for(let i=0;i<items.length;i++){
       const it = items[i]||{};
@@ -370,14 +376,14 @@ async function importFromControlJSON(){
       if(!codigo){ skipped++; continue; }
       if(!nombre && !imgData){ skipped++; continue; }
       setSt('Procesando '+(i+1)+'/'+items.length+' · '+codigo);
+      // Dar un tick al UI para que se vea el estado
+      await new Promise(r => setTimeout(r, 0));
       const found = (data.products||[]).find(p => normCodigo(p.codigo)===normCodigo(codigo));
+      // Imagen: guardar dataURL directo (rápido y fiable). Storage es opcional.
+      let img = imgData || '';
       if(found){
         const id = found.id;
-        let img = found.img||'';
-        if(imgData){
-          try{ img = await uploadImageDataUrl(imgData, 'products/import_'+id+'_'+Date.now()+((imgData.indexOf('image/png')>=0)?'.png':'.jpg')); }
-          catch(e){ console.warn('img', e); }
-        }
+        if(!img) img = found.img || 'images/logo.png';
         const prod = {
           id,
           name: nombre || found.name,
@@ -393,18 +399,13 @@ async function importFromControlJSON(){
         updated++;
       } else {
         const id = Date.now()+i;
-        let img = 'images/logo.png';
-        if(imgData){
-          try{ img = await uploadImageDataUrl(imgData, 'products/import_'+id+((imgData.indexOf('image/png')>=0)?'.png':'.jpg')); }
-          catch(e){ console.warn('img', e); }
-        }
         const prod = {
           id,
           name: nombre || codigo,
           codigo: codigo,
           cat: 'otros',
           desc: '',
-          img,
+          img: img || 'images/logo.png',
           available: true
         };
         await db.ref('products/'+id).set(prod);
@@ -413,7 +414,7 @@ async function importFromControlJSON(){
       }
     }
     renderProductsAdmin();
-    try{ renderProducts && renderProducts(); }catch(e){}
+    try{ if(typeof renderProducts==='function') renderProducts(); }catch(e){}
     input.value = '';
     const msg = 'Import listo: '+created+' nuevo(s), '+updated+' actualizado(s)'+(skipped? ', '+skipped+' omitido(s)':'');
     setSt(msg);
@@ -423,7 +424,6 @@ async function importFromControlJSON(){
     setSt('Error: '+(e.message||e));
     alert('Error al importar: '+(e.message||e));
   }
-  showLoading(false);
 }
 
 async function uploadImage(file, path){
