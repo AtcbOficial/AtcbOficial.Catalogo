@@ -240,6 +240,13 @@ nav{width:100%;justify-content:center;flex-wrap:wrap}
     </div>
     <div id="productosAdmin" class="admin-content">
       <h3>Productos</h3>
+      <div style="background:var(--card);border:1px solid var(--blue);border-radius:12px;padding:12px;margin-bottom:16px">
+        <h4 style="margin:0 0 8px;color:var(--blue)">📥 Importar desde Control</h4>
+        <p style="font-size:.85rem;color:var(--muted);margin:0 0 10px">JSON exportado del master (solo <strong>código id</strong>, <strong>nombre</strong> y <strong>foto</strong>). Actualiza o crea por código id.</p>
+        <input type="file" id="importControlFile" accept=".json,application/json" style="margin-bottom:8px">
+        <button type="button" class="btn primary" onclick="importFromControlJSON()">Importar JSON</button>
+        <p id="importControlStatus" style="font-size:.8rem;color:var(--muted);margin:8px 0 0"></p>
+      </div>
       <div id="productsAdminList"></div>
       <h4>Agregar / Editar Producto</h4>
       <input type="hidden" id="editProdId">
@@ -331,6 +338,93 @@ let lbIndex = 0;
 let slideTimers = [];
 
 function showLoading(on){document.getElementById("fbLoading").style.display=on?"flex":"none"}
+
+
+/** Sube dataURL (base64) a Storage y devuelve URL de descarga */
+async function uploadImageDataUrl(dataUrl, path){
+  if(!dataUrl || dataUrl.indexOf('data:image')!==0) return "";
+  const res = await fetch(dataUrl);
+  const blob = await res.blob();
+  const ref = storage.ref(path);
+  await ref.put(blob);
+  return await ref.getDownloadURL();
+}
+function normCodigo(c){ return String(c||'').trim().toLowerCase(); }
+async function importFromControlJSON(){
+  const input = document.getElementById('importControlFile');
+  const st = document.getElementById('importControlStatus');
+  const setSt = (t) => { if(st) st.textContent = t; };
+  if(!input || !input.files || !input.files[0]){ alert('Elige el archivo JSON exportado desde Control'); return; }
+  showLoading(true);
+  try{
+    const textJson = await input.files[0].text();
+    const dataIn = JSON.parse(textJson);
+    const items = Array.isArray(dataIn.items) ? dataIn.items : (Array.isArray(dataIn) ? dataIn : []);
+    if(!items.length){ alert('El JSON no trae productos (items)'); showLoading(false); return; }
+    let created=0, updated=0, skipped=0;
+    for(let i=0;i<items.length;i++){
+      const it = items[i]||{};
+      const codigo = String(it.codigo||it.code||'').trim();
+      const nombre = String(it.nombre||it.name||'').trim();
+      const imgData = (typeof it.img==='string' && it.img.indexOf('data:image')===0) ? it.img : '';
+      if(!codigo){ skipped++; continue; }
+      if(!nombre && !imgData){ skipped++; continue; }
+      setSt('Procesando '+(i+1)+'/'+items.length+' · '+codigo);
+      const found = (data.products||[]).find(p => normCodigo(p.codigo)===normCodigo(codigo));
+      if(found){
+        const id = found.id;
+        let img = found.img||'';
+        if(imgData){
+          try{ img = await uploadImageDataUrl(imgData, 'products/import_'+id+'_'+Date.now()+'.jpg'); }
+          catch(e){ console.warn('img', e); }
+        }
+        const prod = {
+          id,
+          name: nombre || found.name,
+          codigo: codigo,
+          cat: found.cat || 'otros',
+          desc: found.desc || '',
+          img: img || found.img || 'images/logo.png',
+          available: found.available !== false
+        };
+        await db.ref('products/'+id).set(prod);
+        const ix = data.products.findIndex(p=>p.id===id);
+        if(ix>=0) data.products[ix]=prod; else data.products.unshift(prod);
+        updated++;
+      } else {
+        const id = Date.now()+i;
+        let img = 'images/logo.png';
+        if(imgData){
+          try{ img = await uploadImageDataUrl(imgData, 'products/import_'+id+'.jpg'); }
+          catch(e){ console.warn('img', e); }
+        }
+        const prod = {
+          id,
+          name: nombre || codigo,
+          codigo: codigo,
+          cat: 'otros',
+          desc: '',
+          img,
+          available: true
+        };
+        await db.ref('products/'+id).set(prod);
+        data.products.unshift(prod);
+        created++;
+      }
+    }
+    renderProductsAdmin();
+    try{ renderProducts && renderProducts(); }catch(e){}
+    input.value = '';
+    const msg = 'Import listo: '+created+' nuevo(s), '+updated+' actualizado(s)'+(skipped? ', '+skipped+' omitido(s)':'');
+    setSt(msg);
+    alert(msg);
+  }catch(e){
+    console.error(e);
+    setSt('Error: '+(e.message||e));
+    alert('Error al importar: '+(e.message||e));
+  }
+  showLoading(false);
+}
 
 async function uploadImage(file, path){
   const ref = storage.ref(path);
