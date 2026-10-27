@@ -263,7 +263,9 @@ nav{width:100%;justify-content:center;flex-wrap:wrap}
         <option value="otros">Otros</option>
       </select>
       <textarea id="prodDesc" placeholder="Detalles"></textarea>
-      <input type="file" id="prodImg" accept="image/*">
+      <label style="font-size:.8rem;color:var(--muted)">Link imagen (https://…)</label>
+      <input type="url" id="prodImgUrl" placeholder="https://drive.google.com/… o cualquier URL pública">
+      <p style="font-size:.75rem;color:var(--muted);margin:4px 0 8px">No se sube archivo. Solo link público.</p>
       <label><input type="checkbox" id="prodStock" checked> Disponible</label>
       <button class="btn primary" onclick="saveProduct()">Guardar Producto</button>
       <div class="preview" id="previewProd"></div>
@@ -372,7 +374,7 @@ async function importFromControlJSON(){
       const it = items[i]||{};
       const codigo = normCodigo(it.codigo||it.code||'');
       const nombre = String(it.nombre||it.name||'').trim();
-      const imgData = (typeof it.img==='string' && it.img.indexOf('data:image')===0) ? it.img : '';
+      const imgData = (typeof it.img==='string' && (it.img.indexOf('http')===0 || it.img.indexOf('data:image')===0)) ? it.img : '';
       if(!codigo){ skipped++; continue; }
       if(!nombre && !imgData){ skipped++; continue; }
       setSt('Procesando '+(i+1)+'/'+items.length+' · '+codigo);
@@ -381,9 +383,10 @@ async function importFromControlJSON(){
       const found = (data.products||[]).find(p => normCodigo(p.codigo)===normCodigo(codigo));
       // Imagen: guardar dataURL directo (rápido y fiable). Storage es opcional.
       let img = imgData || '';
+      if(img.indexOf('data:')===0) img = ''; // no base64 en catálogo/Firebase
       if(found){
         const id = found.id;
-        if(!img) img = found.img || 'images/logo.png';
+        if(!img) img = (found.img && String(found.img).indexOf('data:')!==0) ? found.img : 'images/logo.png';
         const prod = {
           id,
           name: nombre || found.name,
@@ -645,9 +648,6 @@ function renderProductsAdmin(){
     <button class="btn secondary" onclick="deleteProduct(${p.id})">Borrar</button></div></div>`).join("");
 }
 
-document.getElementById("prodImg")?.addEventListener("change",function(){
-  const f=this.files[0];if(!f)return;const r=new FileReader();r.onload=e=>updateProdPreview(e.target.result);r.readAsDataURL(f);
-});
 document.getElementById("prodName")?.addEventListener("input",()=>updateProdPreview());
 document.getElementById("prodDesc")?.addEventListener("input",()=>updateProdPreview());
 
@@ -667,19 +667,26 @@ function editProduct(id){
   document.getElementById("prodCat").value=p.cat;
   document.getElementById("prodDesc").value=p.desc||"";
   document.getElementById("prodStock").checked=!!p.available;
-  document.getElementById("prodImg").value="";
+  const iu=document.getElementById("prodImgUrl"); if(iu)iu.value=(p.img&&String(p.img).indexOf("http")===0)?p.img:"";
   updateProdPreview(p.img);
   showAdminTab("productosAdmin");
   document.querySelectorAll(".admin-tab")[1]?.classList.add("active");
 }
 
+function normImgUrlCat(u){
+  u=String(u||"").trim();
+  if(!u||u.indexOf("data:")===0)return "";
+  if(/^https?:\/\//i.test(u))return u;
+  if(u.indexOf("//")===0)return "https:"+u;
+  return u;
+}
 async function saveProduct(){
   const name=document.getElementById("prodName").value.trim();
   let codigo=normCodigo(document.getElementById("prodCodigo").value);
   const cat=document.getElementById("prodCat").value;
   const desc=document.getElementById("prodDesc").value.trim();
   const available=document.getElementById("prodStock").checked;
-  const file=document.getElementById("prodImg").files[0];
+  let img=normImgUrlCat((document.getElementById("prodImgUrl")||{}).value);
   const id=editingProdId||Date.now();
   if(!name){alert("Nombre obligatorio");return}
   if(codigo){
@@ -689,8 +696,8 @@ async function saveProduct(){
   }
   showLoading(true);
   try{
-    let img=editingProdId?(data.products.find(p=>p.id===id)?.img||""):"";
-    if(file)img=await uploadImage(file,`products/${id}_${file.name}`);
+    if(!img)img=editingProdId?(data.products.find(p=>p.id===id)?.img||""):"";
+    if(img&&img.indexOf("data:")===0)img="";
     if(!img)img="images/logo.png";
     const prod={id,name,codigo,cat,desc,img,available};
     await db.ref("products/"+id).set(prod);
@@ -706,7 +713,7 @@ function clearProdForm(){
   document.getElementById("prodName").value="";
   document.getElementById("prodCodigo").value="";
   document.getElementById("prodDesc").value="";
-  document.getElementById("prodImg").value="";
+  const iu=document.getElementById("prodImgUrl"); if(iu)iu.value="";
   document.getElementById("prodStock").checked=true;
   document.getElementById("previewProd").innerHTML="";
 }
