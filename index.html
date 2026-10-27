@@ -354,7 +354,7 @@ async function uploadImageDataUrl(dataUrl, path, timeoutMs){
   const timeout = new Promise((_, rej) => setTimeout(() => rej(new Error('Storage timeout')), ms));
   return Promise.race([work, timeout]);
 }
-function normCodigo(c){ return String(c||'').trim().toLowerCase(); }
+function normCodigo(c){ return String(c||'').trim().toUpperCase(); }
 /** Import desde Control: igual de rápido que perfumes (img en RTDB; Storage opcional) */
 async function importFromControlJSON(){
   const input = document.getElementById('importControlFile');
@@ -370,7 +370,7 @@ async function importFromControlJSON(){
     let created=0, updated=0, skipped=0;
     for(let i=0;i<items.length;i++){
       const it = items[i]||{};
-      const codigo = String(it.codigo||it.code||'').trim();
+      const codigo = normCodigo(it.codigo||it.code||'');
       const nombre = String(it.nombre||it.name||'').trim();
       const imgData = (typeof it.img==='string' && it.img.indexOf('data:image')===0) ? it.img : '';
       if(!codigo){ skipped++; continue; }
@@ -675,13 +675,18 @@ function editProduct(id){
 
 async function saveProduct(){
   const name=document.getElementById("prodName").value.trim();
-  const codigo=document.getElementById("prodCodigo").value.trim();
+  let codigo=normCodigo(document.getElementById("prodCodigo").value);
   const cat=document.getElementById("prodCat").value;
   const desc=document.getElementById("prodDesc").value.trim();
   const available=document.getElementById("prodStock").checked;
   const file=document.getElementById("prodImg").files[0];
   const id=editingProdId||Date.now();
   if(!name){alert("Nombre obligatorio");return}
+  if(codigo){
+    const dup=(data.products||[]).find(p=>normCodigo(p.codigo)===codigo && +p.id!==+id);
+    if(dup){alert('Código id "'+codigo+'" ya existe en: '+(dup.name||'otro producto'));return}
+    document.getElementById("prodCodigo").value=codigo;
+  }
   showLoading(true);
   try{
     let img=editingProdId?(data.products.find(p=>p.id===id)?.img||""):"";
