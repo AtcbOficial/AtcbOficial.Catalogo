@@ -234,12 +234,12 @@ nav{width:100%;justify-content:center;flex-wrap:wrap}
       <div id="galleryAdminList"></div>
       <h4>Agregar Proyecto</h4>
       <input type="text" id="newGalDesc" placeholder="Descripción">
-      <input type="file" id="newGalImg" accept="image/*">
+      <input type="url" id="newGalImgUrl" placeholder="https://… link imagen galería">
       <button class="btn primary" onclick="addGalleryItem()">Agregar a Galería</button>
       <div class="preview" id="previewGal"></div>
     </div>
     <div id="productosAdmin" class="admin-content">
-      <h3>Productos</h3>
+      <h3>Productos</h3><button type="button" class="btn secondary" onclick="cleanCatalogImages()" style="margin-bottom:10px">🧹 Quitar imágenes embebidas</button>
       <div style="background:var(--card);border:1px solid var(--blue);border-radius:12px;padding:12px;margin-bottom:16px">
         <h4 style="margin:0 0 8px;color:var(--blue)">📥 Importar desde Control</h4>
         <p style="font-size:.85rem;color:var(--muted);margin:0 0 10px">JSON exportado del master (solo <strong>código id</strong>, <strong>nombre</strong> y <strong>foto</strong>). Actualiza o crea por código id.</p>
@@ -316,19 +316,19 @@ const INITIAL = {
   instagram: "AtcbOficial",
   adminPass: "atcb2024",
   products: {
-    "1": {id:1,name:"Cuarto Frío 10m³",cat:"cuartos",desc:"Cuarto frío industrial de 10 m³. Paneles, condensadora y evaporadora.",img:"images/banner.png",available:true},
-    "2": {id:2,name:"Nevera Exhibidora Vertical 2 Puertas",cat:"exhibidoras",desc:"Exhibidora comercial 2 puertas vidrio. 800L.",img:"images/logo.png",available:true},
-    "3": {id:3,name:"Nevera Doméstica 350L",cat:"domestica",desc:"Nevera doméstica 350L eficiencia A+.",img:"images/foto.png",available:true},
-    "4": {id:4,name:"Lavadora Industrial 15kg",cat:"lavadoras",desc:"Lavadora industrial 15kg. Ideal hoteles.",img:"images/banner.png",available:false},
-    "5": {id:5,name:"Manifold Digital R410A",cat:"herramientas",desc:"Manifold digital R410A/R22/R134a.",img:"images/logo.png",available:true},
-    "6": {id:6,name:"Kit de Herramientas Básicas",cat:"herramientas",desc:"Set herramientas para técnico de refrigeración.",img:"images/foto.png",available:true},
-    "7": {id:7,name:"Unidad Condensadora 3HP",cat:"otros",desc:"Unidad condensadora 3HP R404A.",img:"images/banner.png",available:true},
-    "8": {id:8,name:"Nevera Exhibidora Horizontal",cat:"exhibidoras",desc:"Exhibidora horizontal tipo isla 500L.",img:"images/logo.png",available:true}
+    "1": {id:1,name:"Cuarto Frío 10m³",cat:"cuartos",desc:"Cuarto frío industrial de 10 m³. Paneles, condensadora y evaporadora.",img:"",available:true},
+    "2": {id:2,name:"Nevera Exhibidora Vertical 2 Puertas",cat:"exhibidoras",desc:"Exhibidora comercial 2 puertas vidrio. 800L.",img:"",available:true},
+    "3": {id:3,name:"Nevera Doméstica 350L",cat:"domestica",desc:"Nevera doméstica 350L eficiencia A+.",img:"",available:true},
+    "4": {id:4,name:"Lavadora Industrial 15kg",cat:"lavadoras",desc:"Lavadora industrial 15kg. Ideal hoteles.",img:"",available:false},
+    "5": {id:5,name:"Manifold Digital R410A",cat:"herramientas",desc:"Manifold digital R410A/R22/R134a.",img:"",available:true},
+    "6": {id:6,name:"Kit de Herramientas Básicas",cat:"herramientas",desc:"Set herramientas para técnico de refrigeración.",img:"",available:true},
+    "7": {id:7,name:"Unidad Condensadora 3HP",cat:"otros",desc:"Unidad condensadora 3HP R404A.",img:"",available:true},
+    "8": {id:8,name:"Nevera Exhibidora Horizontal",cat:"exhibidoras",desc:"Exhibidora horizontal tipo isla 500L.",img:"",available:true}
   },
   gallery: {
-    "1": {id:1,desc:"Instalación de cuarto frío industrial completo",img:"images/banner.png"},
-    "2": {id:2,desc:"Nevera exhibidora comercial lista para negocio",img:"images/logo.png"},
-    "3": {id:3,desc:"Mantenimiento y reparación de sistemas de refrigeración",img:"images/foto.png"}
+    "1": {id:1,desc:"Instalación de cuarto frío industrial completo",img:""},
+    "2": {id:2,desc:"Nevera exhibidora comercial lista para negocio",img:""},
+    "3": {id:3,desc:"Mantenimiento y reparación de sistemas de refrigeración",img:""}
   }
 };
 
@@ -374,7 +374,7 @@ async function importFromControlJSON(){
       const it = items[i]||{};
       const codigo = normCodigo(it.codigo||it.code||'');
       const nombre = String(it.nombre||it.name||'').trim();
-      const imgData = (typeof it.img==='string' && (it.img.indexOf('http')===0 || it.img.indexOf('data:image')===0)) ? it.img : '';
+      const imgData = (typeof it.img==='string' && it.img.indexOf('http')===0) ? it.img : '';
       if(!codigo){ skipped++; continue; }
       if(!nombre && !imgData){ skipped++; continue; }
       setSt('Procesando '+(i+1)+'/'+items.length+' · '+codigo);
@@ -386,14 +386,14 @@ async function importFromControlJSON(){
       if(img.indexOf('data:')===0) img = ''; // no base64 en catálogo/Firebase
       if(found){
         const id = found.id;
-        if(!img) img = (found.img && String(found.img).indexOf('data:')!==0) ? found.img : 'images/logo.png';
+        if(!img) img = (found.img && String(found.img).indexOf('http')===0) ? found.img : '';
         const prod = {
           id,
           name: nombre || found.name,
           codigo: codigo,
           cat: found.cat || 'otros',
           desc: found.desc || '',
-          img: img || found.img || 'images/logo.png',
+          img: img || found.img || '',
           available: found.available !== false
         };
         await db.ref('products/'+id).set(prod);
@@ -408,7 +408,7 @@ async function importFromControlJSON(){
           codigo: codigo,
           cat: 'otros',
           desc: '',
-          img: img || 'images/logo.png',
+          img: img || '',
           available: true
         };
         await db.ref('products/'+id).set(prod);
@@ -477,7 +477,7 @@ function renderGallery(){
   const allImgs=data.gallery.map(g=>g.img);
   const grid=document.getElementById("galleryGrid");
   grid.innerHTML=data.gallery.map((g,idx)=>{
-    const slides=allImgs.map((src,i)=>`<img src="${src}" class="${i===0?"active":""}" onerror="this.src='images/logo.png'">`).join("");
+    const slides=allImgs.map((src,i)=>`<img src="${src}" class="${i===0?"active":""}" onerror="this.style.opacity='0.25'">`).join("");
     return `<div class="gallery-item" onclick="openLightbox(${idx})"><div class="slides">${slides}</div><p>${g.desc}</p></div>`;
   }).join("");
   startSlideshows();
@@ -518,7 +518,7 @@ function renderProducts(){
   if(!filtered.length){grid.innerHTML='<p style="text-align:center;color:var(--muted);grid-column:1/-1">No hay productos.</p>';return}
   grid.innerHTML=filtered.map(p=>`
     <div class="product-card">
-      <img src="${p.img}" alt="${p.name}" onerror="this.src='images/logo.png'">
+      <img src="${p.img}" alt="${p.name}" onerror="this.style.opacity='0.25'">
       <div class="info">
         <h3>${p.name}</h3>
         ${p.codigo?`<p class="codigo">ID: ${p.codigo}</p>`:''}
@@ -552,7 +552,7 @@ function renderCart(){
   if(!cart.length){list.innerHTML='<p style="text-align:center;color:var(--muted);padding:2rem">Tu carrito está vacío.</p>';orderBtn?.classList.remove("pulse-order");return}
   list.innerHTML=cart.map(item=>`
     <div class="cart-item">
-      <img src="${item.img}" onerror="this.src='images/logo.png'">
+      <img src="${item.img}" onerror="this.style.opacity='0.25'">
       <div class="details"><h4>${item.name}</h4></div>
       <div class="qty"><button onclick="changeQty(${item.id},-1)">−</button><span>${item.qty}</span><button onclick="changeQty(${item.id},1)">+</button></div>
       <button class="btn secondary" style="padding:.4rem .8rem" onclick="removeFromCart(${item.id})">Eliminar</button>
@@ -606,29 +606,35 @@ async function saveHistoria(){
 
 function renderGalleryAdmin(){
   document.getElementById("galleryAdminList").innerHTML=data.gallery.map(g=>`
-    <div class="admin-item"><img src="${g.img}" onerror="this.src='images/logo.png'"><span>${g.desc}</span>
+    <div class="admin-item"><img src="${g.img}" onerror="this.style.opacity='0.25'"><span>${g.desc}</span>
     <div class="actions"><button class="btn secondary" onclick="deleteGallery(${g.id})">Borrar</button></div></div>`).join("");
 }
-document.getElementById("newGalImg")?.addEventListener("change",function(){
-  const f=this.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{document.getElementById("previewGal").innerHTML=`<img src="${e.target.result}"><p>${document.getElementById("newGalDesc").value||""}</p>`};r.readAsDataURL(f);
-});
+(function bindGalUrl(){
+  const el=document.getElementById("newGalImgUrl");
+  if(!el||el._b)return; el._b=1;
+  el.addEventListener("input",()=>{
+    const u=(el.value||"").trim();
+    const d=document.getElementById("newGalDesc").value||"";
+    document.getElementById("previewGal").innerHTML=u.indexOf("http")===0?`<img src="${u}" onerror="this.style.opacity=.3"><p>${d}</p>`:"";
+  });
+})();
 
 async function addGalleryItem(){
   const desc=document.getElementById("newGalDesc").value.trim();
-  const file=document.getElementById("newGalImg").files[0];
-  if(!desc||!file){alert("Completa descripción e imagen");return}
+  let img=(document.getElementById("newGalImgUrl").value||"").trim();
+  if(img.indexOf("data:")===0)img="";
+  if(!desc||!img||img.indexOf("http")!==0){alert("Completa descripción y link https de la imagen");return}
   showLoading(true);
   try{
     const id=Date.now();
-    const img=await uploadImage(file,`gallery/${id}_${file.name}`);
     const item={id,desc,img};
     await db.ref("gallery/"+id).set(item);
     data.gallery.unshift(item);
     renderGalleryAdmin();
     document.getElementById("newGalDesc").value="";
-    document.getElementById("newGalImg").value="";
+    document.getElementById("newGalImgUrl").value="";
     document.getElementById("previewGal").innerHTML="";
-    alert("Guardado en Firebase");
+    alert("Guardado (link)");
   }catch(e){alert(e.message)}
   showLoading(false);
 }
@@ -642,21 +648,28 @@ async function deleteGallery(id){
 
 function renderProductsAdmin(){
   document.getElementById("productsAdminList").innerHTML=data.products.map(p=>`
-    <div class="admin-item"><img src="${p.img}" onerror="this.src='images/logo.png'">
+    <div class="admin-item"><img src="${p.img}" onerror="this.style.opacity='0.25'">
     <div><strong>${p.name}</strong>${p.codigo?` <small style="color:var(--blue)">[${p.codigo}]</small>`:""}<br><small>${p.cat} | ${p.available?"Disponible":"Agotado"}</small></div>
     <div class="actions"><button class="btn primary" onclick="editProduct(${p.id})">Editar</button>
     <button class="btn secondary" onclick="deleteProduct(${p.id})">Borrar</button></div></div>`).join("");
 }
 
 document.getElementById("prodName")?.addEventListener("input",()=>updateProdPreview());
+document.getElementById("prodImgUrl")?.addEventListener("input",function(){
+  const u=(this.value||"").trim();
+  updateProdPreview(u.indexOf("http")===0?u:"");
+});
 document.getElementById("prodDesc")?.addEventListener("input",()=>updateProdPreview());
 
 function updateProdPreview(imgSrc){
   const name=document.getElementById("prodName").value||"Nombre";
   const codigo=document.getElementById("prodCodigo").value||"";
   const desc=document.getElementById("prodDesc").value||"";
-  const img=imgSrc||(editingProdId?data.products.find(p=>p.id===editingProdId)?.img:"images/logo.png");
-  document.getElementById("previewProd").innerHTML=`<img src="${img}" style="max-height:120px"><h4>${name}</h4>${codigo?`<p style="color:var(--blue);font-size:.85rem">ID: ${codigo}</p>`:""}<p style="font-size:.85rem;color:var(--muted)">${desc.substring(0,100)}</p>`;
+  let img=imgSrc||(editingProdId?data.products.find(p=>p.id===editingProdId)?.img:"");
+  if(img&&String(img).indexOf("data:")===0)img="";
+  if(img&&String(img).indexOf("http")!==0)img="";
+  const imgHtml=img?`<img src="${img}" style="max-height:120px" onerror="this.style.opacity=.3">`:`<div style="height:80px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:.85rem">Sin imagen (pega link https)</div>`;
+  document.getElementById("previewProd").innerHTML=`${imgHtml}<h4>${name}</h4>${codigo?`<p style="color:var(--blue);font-size:.85rem">ID: ${codigo}</p>`:""}<p style="font-size:.85rem;color:var(--muted)">${desc.substring(0,100)}</p>`;
 }
 
 function editProduct(id){
@@ -680,6 +693,23 @@ function normImgUrlCat(u){
   if(u.indexOf("//")===0)return "https:"+u;
   return u;
 }
+function stripCatalogBase64(){
+  let n=0;
+  (data.products||[]).forEach(p=>{ if(p&&typeof p.img==="string"&&p.img.indexOf("data:")===0){p.img="";n++;} });
+  (data.gallery||[]).forEach(g=>{ if(g&&typeof g.img==="string"&&g.img.indexOf("data:")===0){g.img="";n++;} });
+  return n;
+}
+async function cleanCatalogImages(){
+  const n=stripCatalogBase64();
+  showLoading(true);
+  try{
+    for(const p of (data.products||[])) await db.ref("products/"+p.id).update({img:p.img||""});
+    for(const g of (data.gallery||[])) await db.ref("gallery/"+g.id).update({img:g.img||""});
+    renderProductsAdmin(); renderGalleryAdmin();
+    alert("Limpieza: "+n+" imagen(es) embebidas quitadas. Usa solo links https.");
+  }catch(e){alert(e.message)}
+  showLoading(false);
+}
 async function saveProduct(){
   const name=document.getElementById("prodName").value.trim();
   let codigo=normCodigo(document.getElementById("prodCodigo").value);
@@ -698,7 +728,7 @@ async function saveProduct(){
   try{
     if(!img)img=editingProdId?(data.products.find(p=>p.id===id)?.img||""):"";
     if(img&&img.indexOf("data:")===0)img="";
-    if(!img)img="images/logo.png";
+    if(!img)img="";
     const prod={id,name,codigo,cat,desc,img,available};
     await db.ref("products/"+id).set(prod);
     const i=data.products.findIndex(p=>p.id===id);
