@@ -141,14 +141,42 @@ nav{width:100%;justify-content:center;flex-wrap:wrap}
 .products,.cart-list{grid-template-columns:repeat(2,1fr);gap:.8rem}
 .hero-text h1{font-size:1.8rem}
 }
+
+.header-social{display:flex;align-items:center;gap:6px;margin-left:8px}
+.header-social a{width:28px;height:28px;border-radius:50%;overflow:hidden;border:1px solid rgba(0,180,255,.35);display:flex;align-items:center;justify-content:center;background:var(--card);flex-shrink:0}
+.header-social a img{width:100%;height:100%;object-fit:cover}
+.header-social a span{font-size:12px}
+.welcome-banner{display:none;position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,.88);align-items:center;justify-content:center;padding:1rem;flex-direction:column}
+.welcome-banner.open{display:flex}
+.welcome-banner img{max-width:min(92vw,520px);max-height:70vh;object-fit:contain;border-radius:14px;border:2px solid var(--blue)}
+.welcome-banner button{margin-top:1rem}
+#skinFx{pointer-events:none;position:fixed;inset:0;z-index:50;overflow:hidden}
+#skinFx .fx-dot{position:absolute;top:-20px;border-radius:50%;opacity:.7;animation:skinFall linear infinite}
+@keyframes skinFall{to{transform:translateY(110vh) rotate(360deg)}}
+body.skin-valentin{--blue:#e91e63;--blue2:#ad1457;--card:#1f1218;--bg:#14080e;--bg2:#1a0c12;--accent:#ff80ab}
+body.skin-madres{--blue:#f48fb1;--blue2:#ec407a;--card:#1a1216;--bg:#120a10;--bg2:#180e14;--accent:#f8bbd0}
+body.skin-padres{--blue:#42a5f5;--blue2:#1e88e5;--card:#0f1620;--bg:#080c14;--bg2:#0c121c;--accent:#90caf9}
+body.skin-halloween{--blue:#ff6d00;--blue2:#e65100;--card:#1a1208;--bg:#0a0604;--bg2:#120a06;--accent:#ffab40}
+body.skin-blackfriday{--blue:#ff1744;--blue2:#d50000;--card:#141414;--bg:#000;--bg2:#111;--accent:#ff5252}
+body.skin-navidad{--blue:#c62828;--blue2:#2e7d32;--card:#1a1212;--bg:#0a0f0a;--bg2:#121a12;--accent:#ffd54f}
+.skin-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.skin-grid button{padding:10px;border-radius:10px;border:1px solid rgba(0,180,255,.3);background:var(--bg);color:var(--text);cursor:pointer;font-size:.85rem}
+.skin-grid button.active{border-color:var(--blue);background:var(--card);color:var(--blue)}
+
 </style>
 </head>
 <body>
+<div id="welcomeBanner" class="welcome-banner" onclick="if(event.target===this)closeWelcomeBanner()">
+  <img id="welcomeBannerImg" alt="Bienvenida" onclick="event.stopPropagation()">
+  <button type="button" class="btn primary" onclick="closeWelcomeBanner()">Cerrar</button>
+</div>
+<div id="skinFx" aria-hidden="true"></div>
 <div id="fbLoading"><div class="spinner"></div><p>Cargando...</p></div>
 <header>
   <div class="logo-area" onclick="showSection('inicio')">
-    <img src="images/logo.png" alt="Logo ATCB" class="logo">
-    <span class="brand">@AtcbOficial</span>
+    <img id="siteLogo" src="images/logo.png" alt="Logo ATCB" class="logo">
+    <span class="brand" id="siteBrand">@AtcbOficial</span>
+    <div class="header-social" id="headerSocial"></div>
   </div>
   <nav id="mainNav">
     <button onclick="showSection('inicio')" class="nav-btn active" data-sec="inicio">Inicio</button>
@@ -172,7 +200,7 @@ nav{width:100%;justify-content:center;flex-wrap:wrap}
   <div class="about animate-fade">
     <h2>¿Quién Soy?</h2>
     <div class="about-content">
-      <img src="images/foto.png" alt="Luis" class="about-photo">
+      <img id="aboutPhoto" src="images/foto.png" alt="Luis" class="about-photo">
       <div id="historiaText"></div>
     </div>
   </div>
@@ -222,6 +250,9 @@ nav{width:100%;justify-content:center;flex-wrap:wrap}
     <button class="btn secondary" onclick="logoutAdmin()">Cerrar Sesión</button>
     <div class="admin-tabs">
       <button class="admin-tab active" onclick="showAdminTab('inicioAdmin')">Inicio / Historia / Galería</button>
+      <button class="admin-tab" onclick="showAdminTab('brandAdmin')">Logo / Foto / Banner</button>
+      <button class="admin-tab" onclick="showAdminTab('socialAdmin')">🔗 Redes encabezado</button>
+      <button class="admin-tab" onclick="showAdminTab('skinAdmin')">🎨 Apariencia</button>
       <button class="admin-tab" onclick="showAdminTab('productosAdmin')">Productos</button>
       <button class="admin-tab" onclick="showAdminTab('configAdmin')">Configuración</button>
     </div>
@@ -238,6 +269,49 @@ nav{width:100%;justify-content:center;flex-wrap:wrap}
       <button class="btn primary" onclick="addGalleryItem()">Agregar a Galería</button>
       <div class="preview" id="previewGal"></div>
     </div>
+    
+    <div id="brandAdmin" class="admin-content">
+      <h3>🖼️ Logo del encabezado</h3>
+      <p class="hint">Link https de la imagen del logo (GitHub, Drive público, etc.)</p>
+      <input type="url" id="editLogoUrl" placeholder="https://… logo">
+      <div class="preview" id="previewLogo"></div>
+      <button class="btn primary" onclick="saveBranding()">Guardar logo y foto</button>
+      <h3 style="margin-top:1.5rem">👤 Foto «Quién soy»</h3>
+      <input type="url" id="editAboutPhotoUrl" placeholder="https://… foto">
+      <div class="preview" id="previewAbout"></div>
+      <h3 style="margin-top:1.5rem">🖼️ Banner al abrir la web</h3>
+      <p class="hint">Imagen que aparece al entrar (una vez por sesión). Déjalo vacío para no mostrar.</p>
+      <input type="url" id="editWelcomeBannerUrl" placeholder="https://… banner de bienvenida">
+      <label style="display:flex;align-items:center;gap:8px;margin:8px 0"><input type="checkbox" id="editWelcomeBannerOn" checked> Mostrar banner al abrir</label>
+      <div class="preview" id="previewWelcome"></div>
+      <button class="btn primary" onclick="saveWelcomeBanner()">Guardar banner</button>
+    </div>
+    <div id="socialAdmin" class="admin-content">
+      <h3>🔗 Iconos y enlaces del encabezado</h3>
+      <p class="hint">WhatsApp, Instagram, TikTok u otros. Icono = link de imagen (opcional).</p>
+      <div id="socialAdminList"></div>
+      <h4>Agregar red</h4>
+      <input type="text" id="socLabel" placeholder="Nombre (ej. TikTok)">
+      <input type="url" id="socUrl" placeholder="https://… enlace">
+      <input type="url" id="socIcon" placeholder="https://… icono (opcional)">
+      <button class="btn primary" onclick="addSocial()">Agregar</button>
+      <button class="btn secondary" onclick="saveSocials()" style="margin-top:8px">💾 Guardar redes</button>
+    </div>
+    <div id="skinAdmin" class="admin-content">
+      <h3>🎨 Apariencia / Skin de temporada</h3>
+      <p class="hint">Colores y ambiente visual. Se aplica al instante para todos los visitantes.</p>
+      <div class="skin-grid" id="skinGrid">
+        <button type="button" data-skin="" onclick="pickSkin(this)">Normal</button>
+        <button type="button" data-skin="valentin" onclick="pickSkin(this)">💕 San Valentín</button>
+        <button type="button" data-skin="madres" onclick="pickSkin(this)">🌸 Día de la Madre</button>
+        <button type="button" data-skin="padres" onclick="pickSkin(this)">👔 Día del Padre</button>
+        <button type="button" data-skin="halloween" onclick="pickSkin(this)">🎃 Halloween</button>
+        <button type="button" data-skin="blackfriday" onclick="pickSkin(this)">🖤 Black Friday</button>
+        <button type="button" data-skin="navidad" onclick="pickSkin(this)">🎄 Navidad</button>
+      </div>
+      <button class="btn primary" onclick="saveSkin()">Guardar apariencia</button>
+    </div>
+
     <div id="productosAdmin" class="admin-content">
       <h3>Productos</h3><button type="button" class="btn secondary" onclick="cleanCatalogImages()" style="margin-bottom:10px">🧹 Quitar imágenes embebidas</button>
       <div style="background:var(--card);border:1px solid var(--blue);border-radius:12px;padding:12px;margin-bottom:16px">
@@ -315,6 +389,12 @@ const INITIAL = {
   whatsapp: "580000000000",
   instagram: "AtcbOficial",
   adminPass: "atcb2024",
+  logoUrl: "",
+  aboutPhotoUrl: "",
+  welcomeBannerUrl: "",
+  welcomeBannerOn: false,
+  skin: "",
+  socials: [],
   products: {
     "1": {id:1,name:"Cuarto Frío 10m³",cat:"cuartos",desc:"Cuarto frío industrial de 10 m³. Paneles, condensadora y evaporadora.",img:"",available:true},
     "2": {id:2,name:"Nevera Exhibidora Vertical 2 Puertas",cat:"exhibidoras",desc:"Exhibidora comercial 2 puertas vidrio. 800L.",img:"",available:true},
@@ -446,17 +526,178 @@ async function loadData(){
   const gallery = v.gallery ? Object.values(v.gallery) : [];
   products.sort((a,b)=>(b.id||0)-(a.id||0));
   gallery.sort((a,b)=>(b.id||0)-(a.id||0));
+  let socials = [];
+  if (Array.isArray(v.socials)) socials = v.socials;
+  else if (v.socials && typeof v.socials === 'object') socials = Object.values(v.socials);
+  if (!socials.length) {
+    if (v.whatsapp) socials.push({id:1,label:'WhatsApp',url:'https://wa.me/'+String(v.whatsapp).replace(/\D/g,''),iconUrl:''});
+    if (v.instagram) socials.push({id:2,label:'Instagram',url:'https://instagram.com/'+String(v.instagram).replace('@',''),iconUrl:''});
+  }
   data = {
     historia: v.historia||"",
     phone: v.phone||"",
     whatsapp: v.whatsapp||"",
     instagram: v.instagram||"",
     adminPass: v.adminPass||"atcb2024",
+    logoUrl: v.logoUrl||"",
+    aboutPhotoUrl: v.aboutPhotoUrl||"",
+    welcomeBannerUrl: v.welcomeBannerUrl||"",
+    welcomeBannerOn: !!v.welcomeBannerOn,
+    skin: v.skin||"",
+    socials,
     products, gallery
   };
+  applyBranding();
+  applySocials();
+  applySkin(data.skin||"");
+  maybeShowWelcome();
 }
 
 function saveCart(){localStorage.setItem("atcb_cart",JSON.stringify(cart));updateCartCount()}
+
+
+function applyBranding(){
+  const logo = document.getElementById('siteLogo');
+  const about = document.getElementById('aboutPhoto');
+  if (logo) logo.src = (data.logoUrl && data.logoUrl.indexOf('http')===0) ? data.logoUrl : 'images/logo.png';
+  if (about) about.src = (data.aboutPhotoUrl && data.aboutPhotoUrl.indexOf('http')===0) ? data.aboutPhotoUrl : 'images/foto.png';
+}
+function applySocials(){
+  const box = document.getElementById('headerSocial');
+  if (!box) return;
+  const list = data.socials || [];
+  box.innerHTML = list.filter(s => s && s.url).map(s => {
+    const url = s.url;
+    const label = s.label || 'Link';
+    if (s.iconUrl && String(s.iconUrl).indexOf('http')===0) {
+      return `<a href="${url}" target="_blank" rel="noopener" title="${label}"><img src="${s.iconUrl}" alt="${label}" onerror="this.parentNode.textContent='🔗'"></a>`;
+    }
+    const letter = (label[0] || '🔗').toUpperCase();
+    return `<a href="${url}" target="_blank" rel="noopener" title="${label}"><span>${letter}</span></a>`;
+  }).join('');
+}
+function applySkin(name){
+  const skins = ['valentin','madres','padres','halloween','blackfriday','navidad'];
+  document.body.classList.remove(...skins.map(s => 'skin-'+s));
+  if (name && skins.includes(name)) document.body.classList.add('skin-'+name);
+  const fx = document.getElementById('skinFx');
+  if (!fx) return;
+  fx.innerHTML = '';
+  if (!name) return;
+  const colors = {
+    valentin:['#e91e63','#ff80ab','#fff'],
+    madres:['#f48fb1','#fce4ec','#f8bbd0'],
+    padres:['#42a5f5','#90caf9','#e3f2fd'],
+    halloween:['#ff6d00','#ffab40','#ffcc80'],
+    blackfriday:['#ff1744','#fff','#9e9e9e'],
+    navidad:['#c62828','#2e7d32','#ffd54f']
+  }[name] || ['#00b4ff'];
+  for (let i=0;i<18;i++){
+    const d=document.createElement('div');
+    d.className='fx-dot';
+    d.style.left=(Math.random()*100)+'%';
+    d.style.width=d.style.height=(4+Math.random()*8)+'px';
+    d.style.background=colors[i%colors.length];
+    d.style.animationDuration=(6+Math.random()*8)+'s';
+    d.style.animationDelay=(Math.random()*5)+'s';
+    fx.appendChild(d);
+  }
+}
+function maybeShowWelcome(){
+  if (!data.welcomeBannerOn) return;
+  const url = data.welcomeBannerUrl || '';
+  if (!url || url.indexOf('http')!==0) return;
+  if (sessionStorage.getItem('atcb_welcome_seen')) return;
+  const img = document.getElementById('welcomeBannerImg');
+  const box = document.getElementById('welcomeBanner');
+  if (img) img.src = url;
+  if (box) box.classList.add('open');
+}
+function closeWelcomeBanner(){
+  document.getElementById('welcomeBanner')?.classList.remove('open');
+  try { sessionStorage.setItem('atcb_welcome_seen','1'); } catch(e){}
+}
+async function saveBranding(){
+  const logoUrl = (document.getElementById('editLogoUrl').value||'').trim();
+  const aboutPhotoUrl = (document.getElementById('editAboutPhotoUrl').value||'').trim();
+  data.logoUrl = logoUrl.indexOf('http')===0 ? logoUrl : '';
+  data.aboutPhotoUrl = aboutPhotoUrl.indexOf('http')===0 ? aboutPhotoUrl : '';
+  showLoading(true);
+  try{
+    await db.ref('/').update({logoUrl:data.logoUrl, aboutPhotoUrl:data.aboutPhotoUrl});
+    applyBranding();
+    alert('Logo y foto guardados');
+  }catch(e){alert(e.message)}
+  showLoading(false);
+}
+async function saveWelcomeBanner(){
+  const url = (document.getElementById('editWelcomeBannerUrl').value||'').trim();
+  data.welcomeBannerUrl = url.indexOf('http')===0 ? url : '';
+  data.welcomeBannerOn = !!document.getElementById('editWelcomeBannerOn').checked;
+  showLoading(true);
+  try{
+    await db.ref('/').update({welcomeBannerUrl:data.welcomeBannerUrl, welcomeBannerOn:data.welcomeBannerOn});
+    alert('Banner guardado');
+  }catch(e){alert(e.message)}
+  showLoading(false);
+}
+function renderSocialAdmin(){
+  const el = document.getElementById('socialAdminList');
+  if (!el) return;
+  const list = data.socials || [];
+  el.innerHTML = list.map((s,i)=>`
+    <div class="admin-item" style="flex-direction:column;align-items:stretch">
+      <strong>${s.label||'Red'}</strong>
+      <small style="color:var(--muted);word-break:break-all">${s.url||''}</small>
+      <div class="actions" style="margin-left:0;margin-top:6px">
+        <button class="btn secondary" onclick="removeSocial(${i})">Borrar</button>
+      </div>
+    </div>`).join('') || '<p class="hint">Sin redes aún</p>';
+}
+function addSocial(){
+  const label = (document.getElementById('socLabel').value||'').trim();
+  const url = (document.getElementById('socUrl').value||'').trim();
+  const iconUrl = (document.getElementById('socIcon').value||'').trim();
+  if (!label || !url) { alert('Nombre y link requeridos'); return; }
+  if (url.indexOf('http')!==0) { alert('El link debe ser https://…'); return; }
+  data.socials = data.socials || [];
+  data.socials.push({id:Date.now(), label, url, iconUrl: iconUrl.indexOf('http')===0?iconUrl:''});
+  document.getElementById('socLabel').value='';
+  document.getElementById('socUrl').value='';
+  document.getElementById('socIcon').value='';
+  renderSocialAdmin();
+  applySocials();
+}
+function removeSocial(i){
+  data.socials.splice(i,1);
+  renderSocialAdmin();
+  applySocials();
+}
+async function saveSocials(){
+  showLoading(true);
+  try{
+    await db.ref('socials').set(data.socials||[]);
+    applySocials();
+    alert('Redes guardadas');
+  }catch(e){alert(e.message)}
+  showLoading(false);
+}
+function pickSkin(btn){
+  document.querySelectorAll('#skinGrid button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const skin = btn.getAttribute('data-skin')||'';
+  data.skin = skin;
+  applySkin(skin);
+}
+async function saveSkin(){
+  showLoading(true);
+  try{
+    await db.ref('skin').set(data.skin||'');
+    alert('Apariencia guardada');
+  }catch(e){alert(e.message)}
+  showLoading(false);
+}
+
 
 function showSection(id){
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
@@ -592,6 +833,17 @@ function loadAdminData(){
   document.getElementById("editPhone").value=data.phone||"";
   document.getElementById("editWhatsapp").value=data.whatsapp||"";
   document.getElementById("editInstagram").value=data.instagram||"";
+  const elLogo=document.getElementById("editLogoUrl"); if(elLogo) elLogo.value=data.logoUrl||"";
+  const elAbout=document.getElementById("editAboutPhotoUrl"); if(elAbout) elAbout.value=data.aboutPhotoUrl||"";
+  const elBan=document.getElementById("editWelcomeBannerUrl"); if(elBan) elBan.value=data.welcomeBannerUrl||"";
+  const elBanOn=document.getElementById("editWelcomeBannerOn"); if(elBanOn) elBanOn.checked=!!data.welcomeBannerOn;
+  const pl=document.getElementById("previewLogo"); if(pl) pl.innerHTML=data.logoUrl?`<img src="${data.logoUrl}">`:'';
+  const pa=document.getElementById("previewAbout"); if(pa) pa.innerHTML=data.aboutPhotoUrl?`<img src="${data.aboutPhotoUrl}">`:'';
+  const pw=document.getElementById("previewWelcome"); if(pw) pw.innerHTML=data.welcomeBannerUrl?`<img src="${data.welcomeBannerUrl}">`:'';
+  document.querySelectorAll("#skinGrid button").forEach(b=>{
+    b.classList.toggle("active", (b.getAttribute("data-skin")||"")===(data.skin||""));
+  });
+  renderSocialAdmin();
   renderGalleryAdmin();renderProductsAdmin();previewHistoria();
 }
 function previewHistoria(){const t=document.getElementById("editHistoria").value;document.getElementById("previewHistoria").innerHTML=t.split("\n\n").map(p=>`<p>${p}</p>`).join("")||"<em>Vacío</em>"}
