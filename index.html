@@ -150,18 +150,85 @@ nav{width:100%;justify-content:center;flex-wrap:wrap}
 .welcome-banner.open{display:flex}
 .welcome-banner img{max-width:min(92vw,520px);max-height:70vh;object-fit:contain;border-radius:14px;border:2px solid var(--blue)}
 .welcome-banner button{margin-top:1rem}
-#skinFx{pointer-events:none;position:fixed;inset:0;z-index:50;overflow:hidden}
-#skinFx .fx-dot{position:absolute;top:-20px;border-radius:50%;opacity:.7;animation:skinFall linear infinite}
-@keyframes skinFall{to{transform:translateY(110vh) rotate(360deg)}}
-body.skin-valentin{--blue:#e91e63;--blue2:#ad1457;--card:#1f1218;--bg:#14080e;--bg2:#1a0c12;--accent:#ff80ab}
-body.skin-madres{--blue:#f48fb1;--blue2:#ec407a;--card:#1a1216;--bg:#120a10;--bg2:#180e14;--accent:#f8bbd0}
-body.skin-padres{--blue:#42a5f5;--blue2:#1e88e5;--card:#0f1620;--bg:#080c14;--bg2:#0c121c;--accent:#90caf9}
-body.skin-halloween{--blue:#ff6d00;--blue2:#e65100;--card:#1a1208;--bg:#0a0604;--bg2:#120a06;--accent:#ffab40}
-body.skin-blackfriday{--blue:#ff1744;--blue2:#d50000;--card:#141414;--bg:#000;--bg2:#111;--accent:#ff5252}
-body.skin-navidad{--blue:#c62828;--blue2:#2e7d32;--card:#1a1212;--bg:#0a0f0a;--bg2:#121a12;--accent:#ffd54f}
+
 .skin-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
 .skin-grid button{padding:10px;border-radius:10px;border:1px solid rgba(0,180,255,.3);background:var(--bg);color:var(--text);cursor:pointer;font-size:.85rem}
 .skin-grid button.active{border-color:var(--blue);background:var(--card);color:var(--blue)}
+
+
+/* ===== Skins de temporada (clon Perfumes L&R) ===== */
+#skinFx{position:fixed;inset:0;pointer-events:none;z-index:90;overflow:hidden}
+#skinFx .fx-dot{
+  position:absolute;top:-28px;border-radius:50%;opacity:.85;
+  animation:skinFall linear infinite;will-change:transform,opacity;line-height:1;
+}
+@keyframes skinFall{
+  0%{transform:translateY(0) rotate(0deg);opacity:0}
+  8%{opacity:.9}
+  100%{transform:translateY(110vh) rotate(360deg);opacity:0}
+}
+.fly-dot{
+  position:fixed;z-index:999;width:28px;height:28px;border-radius:50%;
+  background:var(--blue);pointer-events:none;
+  box-shadow:0 0 16px rgba(0,180,255,.95),0 0 4px #fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;color:#000;font-weight:800;
+  transition:transform .6s cubic-bezier(.2,.8,.2,1),opacity .6s ease;
+}
+.fly-dot.skin-fly{background:transparent!important;box-shadow:0 0 22px rgba(0,0,0,.4);font-size:42px}
+@keyframes bfBlink{0%,100%{opacity:1}50%{opacity:.75}}
+
+body.skin-valentin{--blue:#e91e63;--blue2:#ad1457;--card:#1f1218;--bg:#14080e;--bg2:#1a0c12;--accent:#ff80ab;--muted:#f48fb1}
+body.skin-valentin header{background:linear-gradient(180deg,#3d1424 0%,#1a0a12 55%,#14080e 100%)!important;border-bottom:2px solid #e91e63!important;box-shadow:0 4px 20px rgba(233,30,99,.35)!important}
+body.skin-valentin .brand,body.skin-valentin .logo-area .brand{color:#ff4d8d!important;text-shadow:0 0 16px rgba(233,30,99,.65)}
+body.skin-valentin .nav-btn.active,body.skin-valentin .nav-btn:hover{color:#ff4d8d!important;border-color:#e91e63!important}
+body.skin-valentin .btn.primary,body.skin-valentin .btn.primary:hover{background:linear-gradient(135deg,#e91e63,#ad1457)!important}
+body.skin-valentin .section-title,body.skin-valentin h1,body.skin-valentin h2{color:#ff4d8d!important}
+body.skin-valentin .product-card:hover,body.skin-valentin .gallery-item:hover{border-color:#e91e63!important;box-shadow:0 12px 30px rgba(233,30,99,.25)!important}
+body.skin-valentin .cat-btn.active{background:#e91e63!important;color:#fff!important}
+
+body.skin-madres{--blue:#f48fb1;--blue2:#ec407a;--card:#1a1216;--bg:#120a10;--bg2:#180e14;--accent:#f8bbd0;--muted:#f48fb1}
+body.skin-madres header{background:linear-gradient(180deg,#3a2030 0%,#1a1018 55%,#120a10 100%)!important;border-bottom:2px solid #f48fb1!important;box-shadow:0 4px 18px rgba(244,143,177,.3)!important}
+body.skin-madres .brand{color:#f8bbd0!important;text-shadow:0 0 14px rgba(244,143,177,.55)}
+body.skin-madres .nav-btn.active{color:#f8bbd0!important;border-color:#f48fb1!important}
+body.skin-madres .btn.primary{background:linear-gradient(135deg,#f48fb1,#ec407a)!important;color:#1a0a10!important}
+body.skin-madres .section-title,body.skin-madres h1,body.skin-madres h2{color:#f8bbd0!important}
+body.skin-madres .cat-btn.active{background:#f48fb1!important;color:#1a0a10!important}
+
+body.skin-padres{--blue:#42a5f5;--blue2:#1e88e5;--card:#0f1620;--bg:#080c14;--bg2:#0c121c;--accent:#90caf9;--muted:#90caf9}
+body.skin-padres header{background:linear-gradient(180deg,#163048 0%,#0c1828 55%,#080c14 100%)!important;border-bottom:2px solid #42a5f5!important;box-shadow:0 4px 18px rgba(66,165,245,.3)!important}
+body.skin-padres .brand{color:#64b5f6!important;text-shadow:0 0 14px rgba(66,165,245,.55)}
+body.skin-padres .nav-btn.active{color:#64b5f6!important;border-color:#42a5f5!important}
+body.skin-padres .btn.primary{background:linear-gradient(135deg,#42a5f5,#1e88e5)!important}
+body.skin-padres .section-title,body.skin-padres h1,body.skin-padres h2{color:#64b5f6!important}
+body.skin-padres .cat-btn.active{background:#42a5f5!important;color:#041018!important}
+
+body.skin-halloween{--blue:#ff6d00;--blue2:#e65100;--card:#1a1208;--bg:#0a0604;--bg2:#120a06;--accent:#ffab40;--muted:#ffab40}
+body.skin-halloween header{background:linear-gradient(180deg,#2a1400 0%,#120a04 55%,#0a0604 100%)!important;border-bottom:2px solid #ff6d00!important;box-shadow:0 4px 22px rgba(255,109,0,.4)!important}
+body.skin-halloween .brand{color:#ff9100!important;text-shadow:0 0 18px rgba(255,109,0,.7),0 0 6px #ff6d00}
+body.skin-halloween .nav-btn.active{color:#ff9100!important;border-color:#ff6d00!important}
+body.skin-halloween .btn.primary{background:linear-gradient(135deg,#ff6d00,#e65100)!important;color:#1a0800!important}
+body.skin-halloween .section-title,body.skin-halloween h1,body.skin-halloween h2{color:#ff9100!important}
+body.skin-halloween .product-card{border-color:#3a2200}
+body.skin-halloween .cat-btn.active{background:#ff6d00!important;color:#1a0800!important}
+
+body.skin-blackfriday{--blue:#ff1744;--blue2:#d50000;--card:#141414;--bg:#000;--bg2:#111;--accent:#ff5252;--muted:#ff5252}
+body.skin-blackfriday header{background:linear-gradient(180deg,#1f0508 0%,#0a0a0a 50%,#000 100%)!important;border-bottom:2px solid #ff1744!important;box-shadow:0 4px 22px rgba(255,23,68,.45)!important}
+body.skin-blackfriday .brand{color:#ff1744!important;animation:bfBlink 1.4s ease-in-out infinite;text-shadow:0 0 16px rgba(255,23,68,.65)}
+body.skin-blackfriday .nav-btn.active{color:#ff1744!important;border-color:#ff1744!important}
+body.skin-blackfriday .btn.primary{background:linear-gradient(135deg,#ff1744,#d50000)!important}
+body.skin-blackfriday .section-title,body.skin-blackfriday h1,body.skin-blackfriday h2{color:#ff1744!important}
+body.skin-blackfriday .cat-btn.active{background:#ff1744!important;color:#fff!important}
+
+body.skin-navidad{--blue:#c62828;--blue2:#2e7d32;--card:#1a1212;--bg:#0a0f0a;--bg2:#121a12;--accent:#ffd54f;--muted:#a5d6a7}
+body.skin-navidad header{background:linear-gradient(180deg,#1b3a1f 0%,#0a150c 55%,#06100a 100%)!important;border-bottom:2px solid #e53935!important;box-shadow:0 4px 18px rgba(46,125,50,.35)!important}
+body.skin-navidad .brand{color:#ffd54f!important;text-shadow:0 0 16px rgba(255,213,79,.55)}
+body.skin-navidad .nav-btn.active{color:#ffd54f!important;border-color:#2e7d32!important}
+body.skin-navidad .btn.primary{background:linear-gradient(135deg,#2e7d32,#c62828)!important}
+body.skin-navidad .section-title,body.skin-navidad h1,body.skin-navidad h2{color:#ffd54f!important}
+body.skin-navidad .product-card{border-color:#1b5e20}
+body.skin-navidad .cat-btn.active{background:#2e7d32!important;color:#fff!important}
+
 
 </style>
 </head>
@@ -576,33 +643,60 @@ function applySocials(){
     return `<a href="${url}" target="_blank" rel="noopener" title="${label}"><span>${letter}</span></a>`;
   }).join('');
 }
+var SKIN_FX = {
+  normal: null,
+  valentin: { count: 22, colors: ['#e91e63','#ff80ab','#ffffff'], emoji: ['💕','💖','💗','❤️','💘'], fly: '💕' },
+  madres: { count: 20, colors: ['#f48fb1','#fce4ec','#f8bbd0'], emoji: ['🌸','🌺','🌷','💐','💮'], fly: '🌸' },
+  padres: { count: 18, colors: ['#42a5f5','#90caf9','#e3f2fd'], emoji: ['👔','🎩','💙','⭐','🔧'], fly: '⭐' },
+  halloween: { count: 26, colors: ['#ff6d00','#ffab40','#ffcc80'], emoji: ['🎃','👻','🦇','💀','🧙'], fly: '🎃' },
+  blackfriday: { count: 24, colors: ['#ff1744','#ffffff','#9e9e9e'], emoji: ['🔥','💥','⚡','🖤','✨'], fly: '🔥' },
+  navidad: { count: 24, colors: ['#c62828','#2e7d32','#ffd54f'], emoji: ['🎄','🎅','❄️','⭐','🎁'], fly: '🎄' }
+};
+function getSkin() {
+  var s = (data && data.skin) || '';
+  if (!s || !SKIN_FX.hasOwnProperty(s)) s = 'normal';
+  return s;
+}
 function applySkin(name){
-  const skins = ['valentin','madres','padres','halloween','blackfriday','navidad'];
-  document.body.classList.remove(...skins.map(s => 'skin-'+s));
-  if (name && skins.includes(name)) document.body.classList.add('skin-'+name);
-  const fx = document.getElementById('skinFx');
-  if (!fx) return;
-  fx.innerHTML = '';
-  if (!name) return;
-  const colors = {
-    valentin:['#e91e63','#ff80ab','#fff'],
-    madres:['#f48fb1','#fce4ec','#f8bbd0'],
-    padres:['#42a5f5','#90caf9','#e3f2fd'],
-    halloween:['#ff6d00','#ffab40','#ffcc80'],
-    blackfriday:['#ff1744','#fff','#9e9e9e'],
-    navidad:['#c62828','#2e7d32','#ffd54f']
-  }[name] || ['#00b4ff'];
-  for (let i=0;i<18;i++){
-    const d=document.createElement('div');
-    d.className='fx-dot';
-    d.style.left=(Math.random()*100)+'%';
-    d.style.width=d.style.height=(4+Math.random()*8)+'px';
-    d.style.background=colors[i%colors.length];
-    d.style.animationDuration=(6+Math.random()*8)+'s';
-    d.style.animationDelay=(Math.random()*5)+'s';
-    fx.appendChild(d);
+  if (!name) name = getSkin();
+  if (!SKIN_FX.hasOwnProperty(name)) name = 'normal';
+  var skins = ['valentin','madres','padres','halloween','blackfriday','navidad'];
+  document.body.classList.remove(...skins.map(function(s){ return 'skin-'+s; }));
+  if (name && name !== 'normal') document.body.classList.add('skin-'+name);
+  renderSkinFx(name);
+}
+function renderSkinFx(name){
+  var layer = document.getElementById('skinFx');
+  if (!layer) return;
+  layer.innerHTML = '';
+  var conf = SKIN_FX[name];
+  if (!conf) return;
+  var n = conf.count || 12;
+  for (var i = 0; i < n; i++) {
+    var el = document.createElement('div');
+    el.className = 'fx-dot';
+    var useEmoji = conf.emoji && conf.emoji.length && (i % 3 !== 1);
+    if (useEmoji) {
+      el.textContent = conf.emoji[i % conf.emoji.length];
+      el.style.fontSize = (18 + Math.random() * 16) + 'px';
+      el.style.background = 'transparent';
+      el.style.width = 'auto';
+      el.style.height = 'auto';
+    } else {
+      var c = conf.colors[i % conf.colors.length];
+      var sz = 6 + Math.random() * 10;
+      el.style.width = sz + 'px';
+      el.style.height = sz + 'px';
+      el.style.background = c;
+      el.style.boxShadow = '0 0 8px ' + c;
+    }
+    el.style.left = (Math.random() * 100) + '%';
+    el.style.animationDuration = (6 + Math.random() * 10) + 's';
+    el.style.animationDelay = (-Math.random() * 12) + 's';
+    layer.appendChild(el);
   }
 }
+
 function maybeShowWelcome(){
   if (!data.welcomeBannerOn) return;
   const url = data.welcomeBannerUrl || '';
@@ -779,13 +873,24 @@ function addToCart(id){
   const btn=event.target;btn.classList.add("bounce-btn");btn.textContent="✓ Agregado";
   setTimeout(()=>{btn.textContent="Agregar al Carrito";btn.classList.remove("bounce-btn")},900);
   const card=btn.closest(".product-card");const img=card?.querySelector("img");const cartBtn=document.getElementById("cartNavBtn");
-  if(img&&cartBtn){
-    const r=img.getBoundingClientRect(),cr=cartBtn.getBoundingClientRect();
-    const fly=document.createElement("img");fly.src=img.src;fly.className="fly-img";
-    fly.style.left=r.left+"px";fly.style.top=r.top+"px";fly.style.width=r.width+"px";fly.style.height=r.height+"px";
+  if(cartBtn){
+    const fromEl = (img||btn);
+    const r=fromEl.getBoundingClientRect(),cr=cartBtn.getBoundingClientRect();
+    const skin = (typeof getSkin==='function') ? getSkin() : 'normal';
+    const conf = (typeof SKIN_FX!=='undefined' && SKIN_FX[skin]) ? SKIN_FX[skin] : null;
+    const fly=document.createElement("div");
+    fly.className = "fly-dot" + (conf && conf.fly ? " skin-fly" : "");
+    fly.textContent = (conf && conf.fly) ? conf.fly : "🛒";
+    fly.style.left=(r.left+r.width/2-14)+"px";
+    fly.style.top=(r.top+r.height/2-14)+"px";
     document.body.appendChild(fly);
-    requestAnimationFrame(()=>{fly.style.left=(cr.left+cr.width/2-30)+"px";fly.style.top=(cr.top+cr.height/2-30)+"px";fly.style.width="40px";fly.style.height="40px";fly.style.opacity=".4"});
-    setTimeout(()=>fly.remove(),750);
+    requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>{
+        fly.style.transform="translate("+(cr.left+cr.width/2-r.left-r.width/2)+"px,"+(cr.top+cr.height/2-r.top-r.height/2)+"px) scale(0.7)";
+        fly.style.opacity="0.35";
+      });
+    });
+    setTimeout(()=>fly.remove(),700);
   }
   cartBtn?.classList.add("pulse-cart");setTimeout(()=>cartBtn?.classList.remove("pulse-cart"),1500);
 }
