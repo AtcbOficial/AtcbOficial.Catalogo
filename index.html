@@ -230,6 +230,20 @@ body.skin-navidad .product-card{border-color:#1b5e20}
 body.skin-navidad .cat-btn.active{background:#2e7d32!important;color:#fff!important}
 
 
+
+.tag-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700;background:rgba(0,180,255,.15);color:var(--blue);border:1px solid rgba(0,180,255,.35)}
+.tag-chip button{border:none;background:transparent;color:inherit;cursor:pointer;font-size:12px;padding:0 2px;line-height:1}
+.product-admin{background:var(--card);padding:10px;border-radius:10px;margin-bottom:8px;font-size:13px;display:flex;gap:10px;align-items:center;border:1px solid rgba(0,180,255,.15)}
+.product-admin img{width:48px;height:48px;object-fit:contain;background:#0a1628;border-radius:6px;flex-shrink:0}
+.product-admin .meta{flex:1;min-width:0}
+.product-admin .actions{display:flex;flex-direction:column;gap:4px;flex-shrink:0}
+.product-admin .actions button{padding:6px 10px;font-size:11px}
+.admin-form-box{background:var(--card);border:1px solid rgba(0,180,255,.25);border-radius:12px;padding:14px;margin-top:12px}
+.admin-form-box label{display:block;font-size:12px;color:var(--muted);margin:8px 0 4px}
+.admin-form-box h4{margin:0 0 8px;color:var(--blue)}
+#pTagsChips{display:flex;flex-wrap:wrap;gap:6px;min-height:28px;margin-bottom:8px}
+#tagsAdminList .tag-chip{margin:4px}
+
 </style>
 </head>
 <body>
@@ -380,36 +394,65 @@ body.skin-navidad .cat-btn.active{background:#2e7d32!important;color:#fff!import
     </div>
 
     <div id="productosAdmin" class="admin-content">
-      <h3>Productos</h3><button type="button" class="btn secondary" onclick="cleanCatalogImages()" style="margin-bottom:10px">🧹 Quitar imágenes embebidas</button>
+      <h3>📦 Productos</h3>
+      <button type="button" class="btn secondary" onclick="cleanCatalogImages()" style="margin-bottom:10px">🧹 Quitar imágenes embebidas</button>
+
       <div style="background:var(--card);border:1px solid var(--blue);border-radius:12px;padding:12px;margin-bottom:16px">
         <h4 style="margin:0 0 8px;color:var(--blue)">📥 Importar desde Control</h4>
-        <p style="font-size:.85rem;color:var(--muted);margin:0 0 10px">JSON exportado del master (solo <strong>código id</strong>, <strong>nombre</strong> y <strong>foto</strong>). Actualiza o crea por código id.</p>
+        <p style="font-size:.85rem;color:var(--muted);margin:0 0 10px">JSON del master (código id, nombre, foto). Actualiza o crea por código id.</p>
         <input type="file" id="importControlFile" accept=".json,application/json" style="margin-bottom:8px">
         <button type="button" class="btn primary" onclick="importFromControlJSON()">Importar JSON</button>
         <p id="importControlStatus" style="font-size:.8rem;color:var(--muted);margin:8px 0 0"></p>
       </div>
-      <div id="productsAdminList"></div>
-      <h4>Agregar / Editar Producto</h4>
-      <input type="hidden" id="editProdId">
-      <div class="admin-row">
-        <input type="text" id="prodName" placeholder="Nombre">
-        <input type="text" id="prodCodigo" placeholder="Código ID">
+
+      <div style="background:var(--card);border:1px solid rgba(0,180,255,.2);border-radius:12px;padding:12px;margin-bottom:16px">
+        <h4 style="margin:0 0 6px;color:var(--blue)">🏷️ Etiquetas del catálogo</h4>
+        <p class="hint" style="margin:0 0 8px">Crea etiquetas (ej. Promo, Oferta, Industrial) y asígnalas a cada producto con un clic.</p>
+        <div id="tagsAdminList"></div>
+        <div class="admin-row" style="margin-top:8px;gap:8px;flex-wrap:wrap">
+          <input type="text" id="tagNewLabel" placeholder="Nueva etiqueta (ej. Promo)" style="flex:1;min-width:140px">
+          <input type="color" id="tagNewColor" value="#00b4ff" style="width:48px;height:40px;padding:2px">
+          <button type="button" class="btn primary" onclick="addExtraTag()">➕ Agregar etiqueta</button>
+        </div>
       </div>
-      <select id="prodCat">
-        <option value="cuartos">Cuartos Fríos</option>
-        <option value="exhibidoras">Neveras Exhibidoras</option>
-        <option value="domestica">Nevera Doméstica</option>
-        <option value="lavadoras">Lavadoras</option>
-        <option value="herramientas">Herramientas</option>
-        <option value="otros">Otros</option>
-      </select>
-      <textarea id="prodDesc" placeholder="Detalles"></textarea>
-      <label style="font-size:.8rem;color:var(--muted)">Link imagen (https://…)</label>
-      <input type="url" id="prodImgUrl" placeholder="https://drive.google.com/… o cualquier URL pública">
-      <p style="font-size:.75rem;color:var(--muted);margin:4px 0 8px">No se sube archivo. Solo link público.</p>
-      <label><input type="checkbox" id="prodStock" checked> Disponible</label>
-      <button class="btn primary" onclick="saveProduct()">Guardar Producto</button>
-      <div class="preview" id="previewProd"></div>
+
+      <input type="search" id="adminSearch" placeholder="🔍 Buscar producto para editar…" oninput="renderProductsAdmin()" style="margin-bottom:10px">
+      <div id="productsAdminList"></div>
+
+      <div class="admin-form-box">
+        <h4 id="formTitle">➕ Agregar producto</h4>
+        <input type="hidden" id="editProdId">
+        <label>Nombre</label>
+        <input type="text" id="prodName" placeholder="Ej. Ventilador elko 18 w">
+        <label>Código ID</label>
+        <input type="text" id="prodCodigo" placeholder="Ej. 1-0053" style="text-transform:uppercase">
+        <label>Categoría</label>
+        <select id="prodCat">
+          <option value="cuartos">Cuartos Fríos</option>
+          <option value="exhibidoras">Neveras Exhibidoras</option>
+          <option value="domestica">Nevera Doméstica</option>
+          <option value="lavadoras">Lavadoras</option>
+          <option value="herramientas">Herramientas</option>
+          <option value="otros">Otros</option>
+        </select>
+        <label>Detalles</label>
+        <textarea id="prodDesc" placeholder="Descripción corta"></textarea>
+        <label>Link imagen (https://…)</label>
+        <input type="url" id="prodImgUrl" placeholder="https://… imagen pública">
+        <p class="hint">Solo URL. No se sube archivo a Firebase.</p>
+        <div class="preview" id="previewProd"></div>
+        <label style="margin-top:10px;color:var(--blue)">Etiquetas del producto (puedes varias)</label>
+        <div id="pTagsChips"></div>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
+          <select id="pTagSelect" style="flex:1;min-width:140px;margin:0"><option value="">Agregar etiqueta…</option></select>
+          <button type="button" class="btn primary" style="width:auto;margin:0" onclick="addSelectedTagToProduct()">Agregar</button>
+        </div>
+        <label><input type="checkbox" id="prodStock" checked> Disponible (desmarca = Agotado)</label>
+        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+          <button class="btn primary" onclick="saveProduct()">💾 Guardar producto</button>
+          <button class="btn secondary" type="button" onclick="clearProdForm()">Limpiar / Nuevo</button>
+        </div>
+      </div>
     </div>
     <div id="configAdmin" class="admin-content">
       <h3>Contacto / WhatsApp</h3>
@@ -858,6 +901,7 @@ function renderProducts(){
         <h3>${p.name}</h3>
         ${p.codigo?`<p class="codigo">ID: ${p.codigo}</p>`:''}
         ${!p.available?'<span class="agotado">AGOTADO</span>':''}
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin:4px 0">${(typeof productTags==='function'?productTags(p):[]).map(id=>{const t=tagMeta(id);return `<span class="tag-chip" style="font-size:10px;border-color:${t.color||'var(--blue)'};color:${t.color||'var(--blue)'}">${t.label||id}</span>`;}).join('')}</div>
         <p class="desc">${p.desc||""}</p>
         <button class="btn primary add-btn pulse-add" ${!p.available?'disabled style="opacity:.5"':''} onclick="addToCart(${p.id})">${p.available?"Agregar al Carrito":"No disponible"}</button>
       </div>
@@ -1030,12 +1074,133 @@ async function deleteGallery(id){
   showLoading(false);
 }
 
+
+function defaultExtraTags(){
+  return [
+    {id:'promo', label:'Promo', color:'#ff6d00'},
+    {id:'oferta', label:'Oferta', color:'#00c853'},
+    {id:'nuevo', label:'Nuevo', color:'#00b4ff'},
+    {id:'industrial', label:'Industrial', color:'#7c4dff'}
+  ];
+}
+function ensureExtraTags(){
+  if(!data.extraTags || !Array.isArray(data.extraTags) || !data.extraTags.length){
+    data.extraTags = defaultExtraTags();
+  }
+}
+function productTags(p){
+  if(!p) return [];
+  if(Array.isArray(p.tags)) return p.tags.filter(Boolean).map(String);
+  return [];
+}
+function productHasTag(p, tagId){
+  return productTags(p).indexOf(String(tagId)) >= 0;
+}
+function tagMeta(id){
+  ensureExtraTags();
+  return (data.extraTags||[]).find(t => String(t.id)===String(id)) || {id:id, label:id, color:'#00b4ff'};
+}
+function renderTagsAdmin(){
+  ensureExtraTags();
+  const el = document.getElementById('tagsAdminList');
+  if(!el) return;
+  el.innerHTML = (data.extraTags||[]).map((t,i) =>
+    `<span class="tag-chip" style="border-color:${t.color||'var(--blue)'};color:${t.color||'var(--blue)'}">${t.label||t.id}
+      <button type="button" title="Quitar etiqueta del catálogo" onclick="removeExtraTag(${i})">×</button>
+    </span>`
+  ).join('') || '<span class="hint">Sin etiquetas aún</span>';
+  fillTagSelect();
+}
+function fillTagSelect(){
+  ensureExtraTags();
+  const sel = document.getElementById('pTagSelect');
+  if(!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">Agregar etiqueta…</option>' +
+    (data.extraTags||[]).map(t => `<option value="${t.id}">${t.label||t.id}</option>`).join('');
+  if(cur) sel.value = cur;
+}
+let formTags = [];
+function renderFormTagChips(){
+  const box = document.getElementById('pTagsChips');
+  if(!box) return;
+  box.innerHTML = formTags.map((id,i) => {
+    const t = tagMeta(id);
+    return `<span class="tag-chip" style="border-color:${t.color||'var(--blue)'};color:${t.color||'var(--blue)'}">${t.label||id}
+      <button type="button" onclick="removeFormTag(${i})">×</button></span>`;
+  }).join('') || '<span class="hint">Ninguna etiqueta</span>';
+}
+function addSelectedTagToProduct(){
+  const sel = document.getElementById('pTagSelect');
+  const id = sel && sel.value;
+  if(!id) return;
+  if(formTags.indexOf(id) >= 0) return;
+  formTags.push(id);
+  renderFormTagChips();
+  if(sel) sel.value = '';
+}
+function removeFormTag(i){
+  formTags.splice(i,1);
+  renderFormTagChips();
+}
+async function addExtraTag(){
+  const label = (document.getElementById('tagNewLabel')||{}).value.trim();
+  const color = (document.getElementById('tagNewColor')||{}).value || '#00b4ff';
+  if(!label){ alert('Escribe el nombre de la etiqueta'); return; }
+  ensureExtraTags();
+  const id = label.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || ('tag'+Date.now());
+  if((data.extraTags||[]).some(t => t.id===id || (t.label||'').toLowerCase()===label.toLowerCase())){
+    alert('Esa etiqueta ya existe'); return;
+  }
+  data.extraTags.push({id, label, color});
+  try{
+    await db.ref('extraTags').set(data.extraTags);
+  }catch(e){ console.warn(e); }
+  document.getElementById('tagNewLabel').value = '';
+  renderTagsAdmin();
+}
+async function removeExtraTag(i){
+  ensureExtraTags();
+  const t = data.extraTags[i];
+  if(!t) return;
+  if(!confirm('¿Quitar etiqueta "'+(t.label||t.id)+'" del catálogo? (no borra productos)')) return;
+  data.extraTags.splice(i,1);
+  try{ await db.ref('extraTags').set(data.extraTags); }catch(e){}
+  formTags = formTags.filter(x => x !== t.id);
+  renderTagsAdmin();
+  renderFormTagChips();
+}
+
+
 function renderProductsAdmin(){
-  document.getElementById("productsAdminList").innerHTML=data.products.map(p=>`
-    <div class="admin-item"><img src="${p.img}" onerror="this.style.opacity='0.25'">
-    <div><strong>${p.name}</strong>${p.codigo?` <small style="color:var(--blue)">[${p.codigo}]</small>`:""}<br><small>${p.cat} | ${p.available?"Disponible":"Agotado"}</small></div>
-    <div class="actions"><button class="btn primary" onclick="editProduct(${p.id})">Editar</button>
-    <button class="btn secondary" onclick="deleteProduct(${p.id})">Borrar</button></div></div>`).join("");
+  ensureExtraTags();
+  const q = ((document.getElementById('adminSearch')||{}).value||'').toLowerCase().trim();
+  const list = (data.products||[]).filter(p=>{
+    if(!q) return true;
+    const blob = ((p.name||'')+' '+(p.codigo||'')+' '+(p.cat||'')+' '+(p.desc||'')+' '+(productTags(p).join(' '))).toLowerCase();
+    return blob.includes(q);
+  });
+  const el = document.getElementById("productsAdminList");
+  if(!el) return;
+  el.innerHTML = list.length ? list.map(p=>{
+    const tagsHtml = productTags(p).map(id=>{
+      const t=tagMeta(id);
+      return `<span class="tag-chip" style="font-size:10px;border-color:${t.color||'var(--blue)'};color:${t.color||'var(--blue)'}">${t.label||id}</span>`;
+    }).join(' ');
+    return `<div class="product-admin">
+      <img src="${p.img||''}" onerror="this.style.opacity='0.25'">
+      <div class="meta"><strong>${p.name||''}</strong>
+        ${p.codigo?` <small style="color:var(--blue)">[${p.codigo}]</small>`:''}
+        <br><small>${p.cat||''} · ${p.available?'Disponible':'Agotado'}</small>
+        <div style="margin-top:4px">${tagsHtml}</div>
+      </div>
+      <div class="actions">
+        <button class="btn primary" onclick="editProduct(${p.id})">Editar</button>
+        <button class="btn secondary" onclick="deleteProduct(${p.id})">Borrar</button>
+      </div>
+    </div>`;
+  }).join('') : '<p class="hint">Sin productos'+(q?' (filtro)':'')+'</p>';
+  renderTagsAdmin();
 }
 
 document.getElementById("prodName")?.addEventListener("input",()=>updateProdPreview());
@@ -1059,15 +1224,24 @@ function updateProdPreview(imgSrc){
 function editProduct(id){
   const p=data.products.find(x=>x.id===id);if(!p)return;
   editingProdId=id;
-  document.getElementById("prodName").value=p.name;
+  document.getElementById("prodName").value=p.name||"";
   document.getElementById("prodCodigo").value=p.codigo||"";
-  document.getElementById("prodCat").value=p.cat;
+  document.getElementById("prodCat").value=p.cat||"otros";
   document.getElementById("prodDesc").value=p.desc||"";
   document.getElementById("prodStock").checked=!!p.available;
   const iu=document.getElementById("prodImgUrl"); if(iu)iu.value=(p.img&&String(p.img).indexOf("http")===0)?p.img:"";
+  formTags = productTags(p).slice();
+  fillTagSelect();
+  renderFormTagChips();
   updateProdPreview(p.img);
+  const ft=document.getElementById('formTitle'); if(ft) ft.textContent='✏️ Editar producto';
   showAdminTab("productosAdmin");
-  document.querySelectorAll(".admin-tab")[1]?.classList.add("active");
+  try{
+    document.querySelectorAll(".admin-tab").forEach(t=>t.classList.remove('active'));
+    const tab=[...document.querySelectorAll('.admin-tab')].find(b=>/producto/i.test(b.textContent||''));
+    if(tab) tab.classList.add('active');
+  }catch(e){}
+  try{ document.querySelector('.admin-form-box')?.scrollIntoView({behavior:'smooth',block:'start'}); }catch(e){}
 }
 
 function normImgUrlCat(u){
@@ -1113,7 +1287,7 @@ async function saveProduct(){
     if(!img)img=editingProdId?(data.products.find(p=>p.id===id)?.img||""):"";
     if(img&&img.indexOf("data:")===0)img="";
     if(!img)img="";
-    const prod={id,name,codigo,cat,desc,img,available};
+    const prod={id,name,codigo,cat,desc,img,available,tags:formTags.slice()};
     await db.ref("products/"+id).set(prod);
     const i=data.products.findIndex(p=>p.id===id);
     if(i>=0)data.products[i]=prod;else data.products.unshift(prod);
@@ -1129,6 +1303,12 @@ function clearProdForm(){
   document.getElementById("prodDesc").value="";
   const iu=document.getElementById("prodImgUrl"); if(iu)iu.value="";
   document.getElementById("prodStock").checked=true;
+  try{ document.getElementById("prodCat").value="herramientas"; }catch(e){}
+  formTags=[];
+  fillTagSelect();
+  renderFormTagChips();
+  const ft=document.getElementById('formTitle'); if(ft) ft.textContent='➕ Agregar producto';
+  updateProdPreview("");
   document.getElementById("previewProd").innerHTML="";
 }
 
