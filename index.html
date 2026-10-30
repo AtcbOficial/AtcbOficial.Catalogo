@@ -606,18 +606,20 @@ async function importFromControlJSON(){
       if(found){
         const id = found.id;
         if(!img) img = (found.img && String(found.img).indexOf('http')===0) ? found.img : '';
-        const prod = {
-          id,
+        // Solo nombre + imagen (+ código). NO tocar etiquetas, cat, desc, available, etc.
+        const patch = {
           name: nombre || found.name,
-          codigo: codigo,
-          cat: found.cat || 'otros',
-          desc: found.desc || '',
-          img: img || found.img || '',
-          available: found.available !== false
+          codigo: codigo
         };
-        await db.ref('products/'+id).set(prod);
+        if (img) patch.img = img;
+        await db.ref('products/'+id).update(patch);
         const ix = data.products.findIndex(p=>p.id===id);
-        if(ix>=0) data.products[ix]=prod; else data.products.unshift(prod);
+        if(ix>=0){
+          data.products[ix] = Object.assign({}, data.products[ix], patch);
+          // conservar tags y resto de campos locales
+        } else {
+          data.products.unshift(Object.assign({}, found, patch));
+        }
         updated++;
       } else {
         const id = Date.now()+i;
@@ -628,7 +630,8 @@ async function importFromControlJSON(){
           cat: 'otros',
           desc: '',
           img: img || '',
-          available: true
+          available: true,
+          tags: []
         };
         await db.ref('products/'+id).set(prod);
         data.products.unshift(prod);
