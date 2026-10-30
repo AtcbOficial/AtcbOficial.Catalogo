@@ -772,7 +772,9 @@ function renderProducts(){
 
 function addToCart(id){
   const prod=data.products.find(p=>p.id===id);if(!prod||!prod.available)return;
-  const ex=cart.find(c=>c.id===id);if(ex)ex.qty++;else cart.push({id:prod.id,name:prod.name,img:prod.img,qty:1});
+  const ex=cart.find(c=>c.id===id);if(ex)ex.qty++;else cart.push({id:prod.id,name:prod.name,img:prod.img,qty:1,codigo:prod.codigo||''});
+  // si ya estaba, asegurar codigo
+  if(ex && !ex.codigo && prod.codigo) ex.codigo = prod.codigo;
   saveCart();
   const btn=event.target;btn.classList.add("bounce-btn");btn.textContent="✓ Agregado";
   setTimeout(()=>{btn.textContent="Agregar al Carrito";btn.classList.remove("bounce-btn")},900);
@@ -806,10 +808,35 @@ function removeFromCart(id){cart=cart.filter(c=>c.id!==id);saveCart();renderCart
 function clearCart(){if(confirm("¿Vaciar carrito?")){cart=[];saveCart();renderCart()}}
 function sendWhatsApp(){
   if(!cart.length){alert("Carrito vacío");return}
-  let msg="Hola! Quiero hacer el siguiente pedido:%0A%0A";
-  cart.forEach(i=>{msg+=`• ${i.name} x${i.qty}%0A`});
-  msg+="%0AGracias!";
-  window.open(`https://wa.me/${data.whatsapp}?text=${msg}`,"_blank");
+  const lines = [];
+  lines.push("PEDIDO:");
+  lines.push("");
+  cart.forEach(i => {
+    lines.push("• " + i.qty + " " + (i.name || ""));
+  });
+  lines.push("");
+  cart.forEach(i => {
+    let cod = (i.codigo || "").trim();
+    if (!cod) {
+      const prod = (data.products || []).find(p => p.id === i.id);
+      cod = (prod && prod.codigo) ? String(prod.codigo).trim() : "";
+    }
+    if (cod) lines.push(cod + ";" + (i.qty || 1));
+  });
+  lines.push("");
+  lines.push("https://www.tiktok.com/@atcboficial");
+  lines.push("https://www.instagram.com/atcboficial");
+  // redes admin si hay
+  try {
+    (data.socials || []).forEach(s => {
+      if (!s || !s.url) return;
+      const u = String(s.url);
+      if (/wa\.me|whatsapp/i.test(u)) return;
+      if (!lines.includes(u)) lines.push(u);
+    });
+  } catch(e) {}
+  const msg = lines.join("\n");
+  window.open(`https://wa.me/${data.whatsapp}?text=${encodeURIComponent(msg)}`,"_blank");
   cart=[];saveCart();renderCart();
 }
 function updateCartCount(){
