@@ -150,99 +150,18 @@ nav{width:100%;justify-content:center;flex-wrap:wrap}
 .welcome-banner.open{display:flex}
 .welcome-banner img{max-width:min(92vw,520px);max-height:70vh;object-fit:contain;border-radius:14px;border:2px solid var(--blue)}
 .welcome-banner button{margin-top:1rem}
-
+#skinFx{pointer-events:none;position:fixed;inset:0;z-index:50;overflow:hidden}
+#skinFx .fx-dot{position:absolute;top:-20px;border-radius:50%;opacity:.7;animation:skinFall linear infinite}
+@keyframes skinFall{to{transform:translateY(110vh) rotate(360deg)}}
+body.skin-valentin{--blue:#e91e63;--blue2:#ad1457;--card:#1f1218;--bg:#14080e;--bg2:#1a0c12;--accent:#ff80ab}
+body.skin-madres{--blue:#f48fb1;--blue2:#ec407a;--card:#1a1216;--bg:#120a10;--bg2:#180e14;--accent:#f8bbd0}
+body.skin-padres{--blue:#42a5f5;--blue2:#1e88e5;--card:#0f1620;--bg:#080c14;--bg2:#0c121c;--accent:#90caf9}
+body.skin-halloween{--blue:#ff6d00;--blue2:#e65100;--card:#1a1208;--bg:#0a0604;--bg2:#120a06;--accent:#ffab40}
+body.skin-blackfriday{--blue:#ff1744;--blue2:#d50000;--card:#141414;--bg:#000;--bg2:#111;--accent:#ff5252}
+body.skin-navidad{--blue:#c62828;--blue2:#2e7d32;--card:#1a1212;--bg:#0a0f0a;--bg2:#121a12;--accent:#ffd54f}
 .skin-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
 .skin-grid button{padding:10px;border-radius:10px;border:1px solid rgba(0,180,255,.3);background:var(--bg);color:var(--text);cursor:pointer;font-size:.85rem}
 .skin-grid button.active{border-color:var(--blue);background:var(--card);color:var(--blue)}
-
-
-/* ===== Skins de temporada (clon Perfumes L&R) ===== */
-#skinFx{position:fixed;inset:0;pointer-events:none;z-index:90;overflow:hidden}
-#skinFx .fx-dot{
-  position:absolute;top:-28px;border-radius:50%;opacity:.85;
-  animation:skinFall linear infinite;will-change:transform,opacity;line-height:1;
-}
-@keyframes skinFall{
-  0%{transform:translateY(0) rotate(0deg);opacity:0}
-  8%{opacity:.9}
-  100%{transform:translateY(110vh) rotate(360deg);opacity:0}
-}
-.fly-dot{
-  position:fixed;z-index:999;width:28px;height:28px;border-radius:50%;
-  background:var(--blue);pointer-events:none;
-  box-shadow:0 0 16px rgba(0,180,255,.95),0 0 4px #fff;
-  display:flex;align-items:center;justify-content:center;
-  font-size:13px;color:#000;font-weight:800;
-  transition:transform .6s cubic-bezier(.2,.8,.2,1),opacity .6s ease;
-}
-.fly-dot.skin-fly{background:transparent!important;box-shadow:0 0 22px rgba(0,0,0,.4);font-size:42px}
-@keyframes bfBlink{0%,100%{opacity:1}50%{opacity:.75}}
-
-body.skin-valentin{--blue:#e91e63;--blue2:#ad1457;--card:#1f1218;--bg:#14080e;--bg2:#1a0c12;--accent:#ff80ab;--muted:#f48fb1}
-body.skin-valentin header{background:linear-gradient(180deg,#3d1424 0%,#1a0a12 55%,#14080e 100%)!important;border-bottom:2px solid #e91e63!important;box-shadow:0 4px 20px rgba(233,30,99,.35)!important}
-body.skin-valentin .brand,body.skin-valentin .logo-area .brand{color:#ff4d8d!important;text-shadow:0 0 16px rgba(233,30,99,.65)}
-body.skin-valentin .nav-btn.active,body.skin-valentin .nav-btn:hover{color:#ff4d8d!important;border-color:#e91e63!important}
-body.skin-valentin .btn.primary,body.skin-valentin .btn.primary:hover{background:linear-gradient(135deg,#e91e63,#ad1457)!important}
-body.skin-valentin .section-title,body.skin-valentin h1,body.skin-valentin h2{color:#ff4d8d!important}
-body.skin-valentin .product-card:hover,body.skin-valentin .gallery-item:hover{border-color:#e91e63!important;box-shadow:0 12px 30px rgba(233,30,99,.25)!important}
-body.skin-valentin .cat-btn.active{background:#e91e63!important;color:#fff!important}
-
-body.skin-madres{--blue:#f48fb1;--blue2:#ec407a;--card:#1a1216;--bg:#120a10;--bg2:#180e14;--accent:#f8bbd0;--muted:#f48fb1}
-body.skin-madres header{background:linear-gradient(180deg,#3a2030 0%,#1a1018 55%,#120a10 100%)!important;border-bottom:2px solid #f48fb1!important;box-shadow:0 4px 18px rgba(244,143,177,.3)!important}
-body.skin-madres .brand{color:#f8bbd0!important;text-shadow:0 0 14px rgba(244,143,177,.55)}
-body.skin-madres .nav-btn.active{color:#f8bbd0!important;border-color:#f48fb1!important}
-body.skin-madres .btn.primary{background:linear-gradient(135deg,#f48fb1,#ec407a)!important;color:#1a0a10!important}
-body.skin-madres .section-title,body.skin-madres h1,body.skin-madres h2{color:#f8bbd0!important}
-body.skin-madres .cat-btn.active{background:#f48fb1!important;color:#1a0a10!important}
-
-body.skin-padres{--blue:#42a5f5;--blue2:#1e88e5;--card:#0f1620;--bg:#080c14;--bg2:#0c121c;--accent:#90caf9;--muted:#90caf9}
-body.skin-padres header{background:linear-gradient(180deg,#163048 0%,#0c1828 55%,#080c14 100%)!important;border-bottom:2px solid #42a5f5!important;box-shadow:0 4px 18px rgba(66,165,245,.3)!important}
-body.skin-padres .brand{color:#64b5f6!important;text-shadow:0 0 14px rgba(66,165,245,.55)}
-body.skin-padres .nav-btn.active{color:#64b5f6!important;border-color:#42a5f5!important}
-body.skin-padres .btn.primary{background:linear-gradient(135deg,#42a5f5,#1e88e5)!important}
-body.skin-padres .section-title,body.skin-padres h1,body.skin-padres h2{color:#64b5f6!important}
-body.skin-padres .cat-btn.active{background:#42a5f5!important;color:#041018!important}
-
-body.skin-halloween{--blue:#ff6d00;--blue2:#e65100;--card:#1a1208;--bg:#0a0604;--bg2:#120a06;--accent:#ffab40;--muted:#ffab40}
-body.skin-halloween header{background:linear-gradient(180deg,#2a1400 0%,#120a04 55%,#0a0604 100%)!important;border-bottom:2px solid #ff6d00!important;box-shadow:0 4px 22px rgba(255,109,0,.4)!important}
-body.skin-halloween .brand{color:#ff9100!important;text-shadow:0 0 18px rgba(255,109,0,.7),0 0 6px #ff6d00}
-body.skin-halloween .nav-btn.active{color:#ff9100!important;border-color:#ff6d00!important}
-body.skin-halloween .btn.primary{background:linear-gradient(135deg,#ff6d00,#e65100)!important;color:#1a0800!important}
-body.skin-halloween .section-title,body.skin-halloween h1,body.skin-halloween h2{color:#ff9100!important}
-body.skin-halloween .product-card{border-color:#3a2200}
-body.skin-halloween .cat-btn.active{background:#ff6d00!important;color:#1a0800!important}
-
-body.skin-blackfriday{--blue:#ff1744;--blue2:#d50000;--card:#141414;--bg:#000;--bg2:#111;--accent:#ff5252;--muted:#ff5252}
-body.skin-blackfriday header{background:linear-gradient(180deg,#1f0508 0%,#0a0a0a 50%,#000 100%)!important;border-bottom:2px solid #ff1744!important;box-shadow:0 4px 22px rgba(255,23,68,.45)!important}
-body.skin-blackfriday .brand{color:#ff1744!important;animation:bfBlink 1.4s ease-in-out infinite;text-shadow:0 0 16px rgba(255,23,68,.65)}
-body.skin-blackfriday .nav-btn.active{color:#ff1744!important;border-color:#ff1744!important}
-body.skin-blackfriday .btn.primary{background:linear-gradient(135deg,#ff1744,#d50000)!important}
-body.skin-blackfriday .section-title,body.skin-blackfriday h1,body.skin-blackfriday h2{color:#ff1744!important}
-body.skin-blackfriday .cat-btn.active{background:#ff1744!important;color:#fff!important}
-
-body.skin-navidad{--blue:#c62828;--blue2:#2e7d32;--card:#1a1212;--bg:#0a0f0a;--bg2:#121a12;--accent:#ffd54f;--muted:#a5d6a7}
-body.skin-navidad header{background:linear-gradient(180deg,#1b3a1f 0%,#0a150c 55%,#06100a 100%)!important;border-bottom:2px solid #e53935!important;box-shadow:0 4px 18px rgba(46,125,50,.35)!important}
-body.skin-navidad .brand{color:#ffd54f!important;text-shadow:0 0 16px rgba(255,213,79,.55)}
-body.skin-navidad .nav-btn.active{color:#ffd54f!important;border-color:#2e7d32!important}
-body.skin-navidad .btn.primary{background:linear-gradient(135deg,#2e7d32,#c62828)!important}
-body.skin-navidad .section-title,body.skin-navidad h1,body.skin-navidad h2{color:#ffd54f!important}
-body.skin-navidad .product-card{border-color:#1b5e20}
-body.skin-navidad .cat-btn.active{background:#2e7d32!important;color:#fff!important}
-
-
-
-.tag-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700;background:rgba(0,180,255,.15);color:var(--blue);border:1px solid rgba(0,180,255,.35)}
-.tag-chip button{border:none;background:transparent;color:inherit;cursor:pointer;font-size:12px;padding:0 2px;line-height:1}
-.product-admin{background:var(--card);padding:10px;border-radius:10px;margin-bottom:8px;font-size:13px;display:flex;gap:10px;align-items:center;border:1px solid rgba(0,180,255,.15)}
-.product-admin img{width:48px;height:48px;object-fit:contain;background:#0a1628;border-radius:6px;flex-shrink:0}
-.product-admin .meta{flex:1;min-width:0}
-.product-admin .actions{display:flex;flex-direction:column;gap:4px;flex-shrink:0}
-.product-admin .actions button{padding:6px 10px;font-size:11px}
-.admin-form-box{background:var(--card);border:1px solid rgba(0,180,255,.25);border-radius:12px;padding:14px;margin-top:12px}
-.admin-form-box label{display:block;font-size:12px;color:var(--muted);margin:8px 0 4px}
-.admin-form-box h4{margin:0 0 8px;color:var(--blue)}
-#pTagsChips{display:flex;flex-wrap:wrap;gap:6px;min-height:28px;margin-bottom:8px}
-#tagsAdminList .tag-chip{margin:4px}
 
 </style>
 </head>
@@ -394,65 +313,36 @@ body.skin-navidad .cat-btn.active{background:#2e7d32!important;color:#fff!import
     </div>
 
     <div id="productosAdmin" class="admin-content">
-      <h3>📦 Productos</h3>
-      <button type="button" class="btn secondary" onclick="cleanCatalogImages()" style="margin-bottom:10px">🧹 Quitar imágenes embebidas</button>
-
+      <h3>Productos</h3><button type="button" class="btn secondary" onclick="cleanCatalogImages()" style="margin-bottom:10px">🧹 Quitar imágenes embebidas</button>
       <div style="background:var(--card);border:1px solid var(--blue);border-radius:12px;padding:12px;margin-bottom:16px">
         <h4 style="margin:0 0 8px;color:var(--blue)">📥 Importar desde Control</h4>
-        <p style="font-size:.85rem;color:var(--muted);margin:0 0 10px">JSON del master (código id, nombre, foto). Actualiza o crea por código id.</p>
+        <p style="font-size:.85rem;color:var(--muted);margin:0 0 10px">JSON exportado del master (solo <strong>código id</strong>, <strong>nombre</strong> y <strong>foto</strong>). Actualiza o crea por código id.</p>
         <input type="file" id="importControlFile" accept=".json,application/json" style="margin-bottom:8px">
         <button type="button" class="btn primary" onclick="importFromControlJSON()">Importar JSON</button>
         <p id="importControlStatus" style="font-size:.8rem;color:var(--muted);margin:8px 0 0"></p>
       </div>
-
-      <div style="background:var(--card);border:1px solid rgba(0,180,255,.2);border-radius:12px;padding:12px;margin-bottom:16px">
-        <h4 style="margin:0 0 6px;color:var(--blue)">🏷️ Etiquetas del catálogo</h4>
-        <p class="hint" style="margin:0 0 8px">Crea etiquetas (ej. Promo, Oferta, Industrial) y asígnalas a cada producto con un clic.</p>
-        <div id="tagsAdminList"></div>
-        <div class="admin-row" style="margin-top:8px;gap:8px;flex-wrap:wrap">
-          <input type="text" id="tagNewLabel" placeholder="Nueva etiqueta (ej. Promo)" style="flex:1;min-width:140px">
-          <input type="color" id="tagNewColor" value="#00b4ff" style="width:48px;height:40px;padding:2px">
-          <button type="button" class="btn primary" onclick="addExtraTag()">➕ Agregar etiqueta</button>
-        </div>
-      </div>
-
-      <input type="search" id="adminSearch" placeholder="🔍 Buscar producto para editar…" oninput="renderProductsAdmin()" style="margin-bottom:10px">
       <div id="productsAdminList"></div>
-
-      <div class="admin-form-box">
-        <h4 id="formTitle">➕ Agregar producto</h4>
-        <input type="hidden" id="editProdId">
-        <label>Nombre</label>
-        <input type="text" id="prodName" placeholder="Ej. Ventilador elko 18 w">
-        <label>Código ID</label>
-        <input type="text" id="prodCodigo" placeholder="Ej. 1-0053" style="text-transform:uppercase">
-        <label>Categoría</label>
-        <select id="prodCat">
-          <option value="cuartos">Cuartos Fríos</option>
-          <option value="exhibidoras">Neveras Exhibidoras</option>
-          <option value="domestica">Nevera Doméstica</option>
-          <option value="lavadoras">Lavadoras</option>
-          <option value="herramientas">Herramientas</option>
-          <option value="otros">Otros</option>
-        </select>
-        <label>Detalles</label>
-        <textarea id="prodDesc" placeholder="Descripción corta"></textarea>
-        <label>Link imagen (https://…)</label>
-        <input type="url" id="prodImgUrl" placeholder="https://… imagen pública">
-        <p class="hint">Solo URL. No se sube archivo a Firebase.</p>
-        <div class="preview" id="previewProd"></div>
-        <label style="margin-top:10px;color:var(--blue)">Etiquetas del producto (puedes varias)</label>
-        <div id="pTagsChips"></div>
-        <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
-          <select id="pTagSelect" style="flex:1;min-width:140px;margin:0"><option value="">Agregar etiqueta…</option></select>
-          <button type="button" class="btn primary" style="width:auto;margin:0" onclick="addSelectedTagToProduct()">Agregar</button>
-        </div>
-        <label><input type="checkbox" id="prodStock" checked> Disponible (desmarca = Agotado)</label>
-        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
-          <button class="btn primary" onclick="saveProduct()">💾 Guardar producto</button>
-          <button class="btn secondary" type="button" onclick="clearProdForm()">Limpiar / Nuevo</button>
-        </div>
+      <h4>Agregar / Editar Producto</h4>
+      <input type="hidden" id="editProdId">
+      <div class="admin-row">
+        <input type="text" id="prodName" placeholder="Nombre">
+        <input type="text" id="prodCodigo" placeholder="Código ID">
       </div>
+      <select id="prodCat">
+        <option value="cuartos">Cuartos Fríos</option>
+        <option value="exhibidoras">Neveras Exhibidoras</option>
+        <option value="domestica">Nevera Doméstica</option>
+        <option value="lavadoras">Lavadoras</option>
+        <option value="herramientas">Herramientas</option>
+        <option value="otros">Otros</option>
+      </select>
+      <textarea id="prodDesc" placeholder="Detalles"></textarea>
+      <label style="font-size:.8rem;color:var(--muted)">Link imagen (https://…)</label>
+      <input type="url" id="prodImgUrl" placeholder="https://drive.google.com/… o cualquier URL pública">
+      <p style="font-size:.75rem;color:var(--muted);margin:4px 0 8px">No se sube archivo. Solo link público.</p>
+      <label><input type="checkbox" id="prodStock" checked> Disponible</label>
+      <button class="btn primary" onclick="saveProduct()">Guardar Producto</button>
+      <div class="preview" id="previewProd"></div>
     </div>
     <div id="configAdmin" class="admin-content">
       <h3>Contacto / WhatsApp</h3>
@@ -686,60 +576,33 @@ function applySocials(){
     return `<a href="${url}" target="_blank" rel="noopener" title="${label}"><span>${letter}</span></a>`;
   }).join('');
 }
-var SKIN_FX = {
-  normal: null,
-  valentin: { count: 22, colors: ['#e91e63','#ff80ab','#ffffff'], emoji: ['💕','💖','💗','❤️','💘'], fly: '💕' },
-  madres: { count: 20, colors: ['#f48fb1','#fce4ec','#f8bbd0'], emoji: ['🌸','🌺','🌷','💐','💮'], fly: '🌸' },
-  padres: { count: 18, colors: ['#42a5f5','#90caf9','#e3f2fd'], emoji: ['👔','🎩','💙','⭐','🔧'], fly: '⭐' },
-  halloween: { count: 26, colors: ['#ff6d00','#ffab40','#ffcc80'], emoji: ['🎃','👻','🦇','💀','🧙'], fly: '🎃' },
-  blackfriday: { count: 24, colors: ['#ff1744','#ffffff','#9e9e9e'], emoji: ['🔥','💥','⚡','🖤','✨'], fly: '🔥' },
-  navidad: { count: 24, colors: ['#c62828','#2e7d32','#ffd54f'], emoji: ['🎄','🎅','❄️','⭐','🎁'], fly: '🎄' }
-};
-function getSkin() {
-  var s = (data && data.skin) || '';
-  if (!s || !SKIN_FX.hasOwnProperty(s)) s = 'normal';
-  return s;
-}
 function applySkin(name){
-  if (!name) name = getSkin();
-  if (!SKIN_FX.hasOwnProperty(name)) name = 'normal';
-  var skins = ['valentin','madres','padres','halloween','blackfriday','navidad'];
-  document.body.classList.remove(...skins.map(function(s){ return 'skin-'+s; }));
-  if (name && name !== 'normal') document.body.classList.add('skin-'+name);
-  renderSkinFx(name);
-}
-function renderSkinFx(name){
-  var layer = document.getElementById('skinFx');
-  if (!layer) return;
-  layer.innerHTML = '';
-  var conf = SKIN_FX[name];
-  if (!conf) return;
-  var n = conf.count || 12;
-  for (var i = 0; i < n; i++) {
-    var el = document.createElement('div');
-    el.className = 'fx-dot';
-    var useEmoji = conf.emoji && conf.emoji.length && (i % 3 !== 1);
-    if (useEmoji) {
-      el.textContent = conf.emoji[i % conf.emoji.length];
-      el.style.fontSize = (18 + Math.random() * 16) + 'px';
-      el.style.background = 'transparent';
-      el.style.width = 'auto';
-      el.style.height = 'auto';
-    } else {
-      var c = conf.colors[i % conf.colors.length];
-      var sz = 6 + Math.random() * 10;
-      el.style.width = sz + 'px';
-      el.style.height = sz + 'px';
-      el.style.background = c;
-      el.style.boxShadow = '0 0 8px ' + c;
-    }
-    el.style.left = (Math.random() * 100) + '%';
-    el.style.animationDuration = (6 + Math.random() * 10) + 's';
-    el.style.animationDelay = (-Math.random() * 12) + 's';
-    layer.appendChild(el);
+  const skins = ['valentin','madres','padres','halloween','blackfriday','navidad'];
+  document.body.classList.remove(...skins.map(s => 'skin-'+s));
+  if (name && skins.includes(name)) document.body.classList.add('skin-'+name);
+  const fx = document.getElementById('skinFx');
+  if (!fx) return;
+  fx.innerHTML = '';
+  if (!name) return;
+  const colors = {
+    valentin:['#e91e63','#ff80ab','#fff'],
+    madres:['#f48fb1','#fce4ec','#f8bbd0'],
+    padres:['#42a5f5','#90caf9','#e3f2fd'],
+    halloween:['#ff6d00','#ffab40','#ffcc80'],
+    blackfriday:['#ff1744','#fff','#9e9e9e'],
+    navidad:['#c62828','#2e7d32','#ffd54f']
+  }[name] || ['#00b4ff'];
+  for (let i=0;i<18;i++){
+    const d=document.createElement('div');
+    d.className='fx-dot';
+    d.style.left=(Math.random()*100)+'%';
+    d.style.width=d.style.height=(4+Math.random()*8)+'px';
+    d.style.background=colors[i%colors.length];
+    d.style.animationDuration=(6+Math.random()*8)+'s';
+    d.style.animationDelay=(Math.random()*5)+'s';
+    fx.appendChild(d);
   }
 }
-
 function maybeShowWelcome(){
   if (!data.welcomeBannerOn) return;
   const url = data.welcomeBannerUrl || '';
@@ -901,7 +764,6 @@ function renderProducts(){
         <h3>${p.name}</h3>
         ${p.codigo?`<p class="codigo">ID: ${p.codigo}</p>`:''}
         ${!p.available?'<span class="agotado">AGOTADO</span>':''}
-        <div style="display:flex;flex-wrap:wrap;gap:4px;margin:4px 0">${(typeof productTags==='function'?productTags(p):[]).map(id=>{const t=tagMeta(id);return `<span class="tag-chip" style="font-size:10px;border-color:${t.color||'var(--blue)'};color:${t.color||'var(--blue)'}">${t.label||id}</span>`;}).join('')}</div>
         <p class="desc">${p.desc||""}</p>
         <button class="btn primary add-btn pulse-add" ${!p.available?'disabled style="opacity:.5"':''} onclick="addToCart(${p.id})">${p.available?"Agregar al Carrito":"No disponible"}</button>
       </div>
@@ -910,31 +772,18 @@ function renderProducts(){
 
 function addToCart(id){
   const prod=data.products.find(p=>p.id===id);if(!prod||!prod.available)return;
-  const ex=cart.find(c=>c.id===id);if(ex)ex.qty++;else cart.push({id:prod.id,name:prod.name,img:prod.img,qty:1,codigo:prod.codigo||''});
-  // si ya estaba, asegurar codigo
-  if(ex && !ex.codigo && prod.codigo) ex.codigo = prod.codigo;
+  const ex=cart.find(c=>c.id===id);if(ex)ex.qty++;else cart.push({id:prod.id,name:prod.name,img:prod.img,qty:1});
   saveCart();
   const btn=event.target;btn.classList.add("bounce-btn");btn.textContent="✓ Agregado";
   setTimeout(()=>{btn.textContent="Agregar al Carrito";btn.classList.remove("bounce-btn")},900);
   const card=btn.closest(".product-card");const img=card?.querySelector("img");const cartBtn=document.getElementById("cartNavBtn");
-  if(cartBtn){
-    const fromEl = (img||btn);
-    const r=fromEl.getBoundingClientRect(),cr=cartBtn.getBoundingClientRect();
-    const skin = (typeof getSkin==='function') ? getSkin() : 'normal';
-    const conf = (typeof SKIN_FX!=='undefined' && SKIN_FX[skin]) ? SKIN_FX[skin] : null;
-    const fly=document.createElement("div");
-    fly.className = "fly-dot" + (conf && conf.fly ? " skin-fly" : "");
-    fly.textContent = (conf && conf.fly) ? conf.fly : "🛒";
-    fly.style.left=(r.left+r.width/2-14)+"px";
-    fly.style.top=(r.top+r.height/2-14)+"px";
+  if(img&&cartBtn){
+    const r=img.getBoundingClientRect(),cr=cartBtn.getBoundingClientRect();
+    const fly=document.createElement("img");fly.src=img.src;fly.className="fly-img";
+    fly.style.left=r.left+"px";fly.style.top=r.top+"px";fly.style.width=r.width+"px";fly.style.height=r.height+"px";
     document.body.appendChild(fly);
-    requestAnimationFrame(()=>{
-      requestAnimationFrame(()=>{
-        fly.style.transform="translate("+(cr.left+cr.width/2-r.left-r.width/2)+"px,"+(cr.top+cr.height/2-r.top-r.height/2)+"px) scale(0.7)";
-        fly.style.opacity="0.35";
-      });
-    });
-    setTimeout(()=>fly.remove(),700);
+    requestAnimationFrame(()=>{fly.style.left=(cr.left+cr.width/2-30)+"px";fly.style.top=(cr.top+cr.height/2-30)+"px";fly.style.width="40px";fly.style.height="40px";fly.style.opacity=".4"});
+    setTimeout(()=>fly.remove(),750);
   }
   cartBtn?.classList.add("pulse-cart");setTimeout(()=>cartBtn?.classList.remove("pulse-cart"),1500);
 }
@@ -957,35 +806,10 @@ function removeFromCart(id){cart=cart.filter(c=>c.id!==id);saveCart();renderCart
 function clearCart(){if(confirm("¿Vaciar carrito?")){cart=[];saveCart();renderCart()}}
 function sendWhatsApp(){
   if(!cart.length){alert("Carrito vacío");return}
-  const lines = [];
-  lines.push("PEDIDO:");
-  lines.push("");
-  cart.forEach(i => {
-    lines.push("• " + i.qty + " " + (i.name || ""));
-  });
-  lines.push("");
-  cart.forEach(i => {
-    let cod = (i.codigo || "").trim();
-    if (!cod) {
-      const prod = (data.products || []).find(p => p.id === i.id);
-      cod = (prod && prod.codigo) ? String(prod.codigo).trim() : "";
-    }
-    if (cod) lines.push(cod + ";" + (i.qty || 1));
-  });
-  lines.push("");
-  lines.push("https://www.tiktok.com/@atcboficial");
-  lines.push("https://www.instagram.com/atcboficial");
-  // redes admin si hay
-  try {
-    (data.socials || []).forEach(s => {
-      if (!s || !s.url) return;
-      const u = String(s.url);
-      if (/wa\.me|whatsapp/i.test(u)) return;
-      if (!lines.includes(u)) lines.push(u);
-    });
-  } catch(e) {}
-  const msg = lines.join("\n");
-  window.open(`https://wa.me/${data.whatsapp}?text=${encodeURIComponent(msg)}`,"_blank");
+  let msg="Hola! Quiero hacer el siguiente pedido:%0A%0A";
+  cart.forEach(i=>{msg+=`• ${i.name} x${i.qty}%0A`});
+  msg+="%0AGracias!";
+  window.open(`https://wa.me/${data.whatsapp}?text=${msg}`,"_blank");
   cart=[];saveCart();renderCart();
 }
 function updateCartCount(){
@@ -1074,133 +898,12 @@ async function deleteGallery(id){
   showLoading(false);
 }
 
-
-function defaultExtraTags(){
-  return [
-    {id:'promo', label:'Promo', color:'#ff6d00'},
-    {id:'oferta', label:'Oferta', color:'#00c853'},
-    {id:'nuevo', label:'Nuevo', color:'#00b4ff'},
-    {id:'industrial', label:'Industrial', color:'#7c4dff'}
-  ];
-}
-function ensureExtraTags(){
-  if(!data.extraTags || !Array.isArray(data.extraTags) || !data.extraTags.length){
-    data.extraTags = defaultExtraTags();
-  }
-}
-function productTags(p){
-  if(!p) return [];
-  if(Array.isArray(p.tags)) return p.tags.filter(Boolean).map(String);
-  return [];
-}
-function productHasTag(p, tagId){
-  return productTags(p).indexOf(String(tagId)) >= 0;
-}
-function tagMeta(id){
-  ensureExtraTags();
-  return (data.extraTags||[]).find(t => String(t.id)===String(id)) || {id:id, label:id, color:'#00b4ff'};
-}
-function renderTagsAdmin(){
-  ensureExtraTags();
-  const el = document.getElementById('tagsAdminList');
-  if(!el) return;
-  el.innerHTML = (data.extraTags||[]).map((t,i) =>
-    `<span class="tag-chip" style="border-color:${t.color||'var(--blue)'};color:${t.color||'var(--blue)'}">${t.label||t.id}
-      <button type="button" title="Quitar etiqueta del catálogo" onclick="removeExtraTag(${i})">×</button>
-    </span>`
-  ).join('') || '<span class="hint">Sin etiquetas aún</span>';
-  fillTagSelect();
-}
-function fillTagSelect(){
-  ensureExtraTags();
-  const sel = document.getElementById('pTagSelect');
-  if(!sel) return;
-  const cur = sel.value;
-  sel.innerHTML = '<option value="">Agregar etiqueta…</option>' +
-    (data.extraTags||[]).map(t => `<option value="${t.id}">${t.label||t.id}</option>`).join('');
-  if(cur) sel.value = cur;
-}
-let formTags = [];
-function renderFormTagChips(){
-  const box = document.getElementById('pTagsChips');
-  if(!box) return;
-  box.innerHTML = formTags.map((id,i) => {
-    const t = tagMeta(id);
-    return `<span class="tag-chip" style="border-color:${t.color||'var(--blue)'};color:${t.color||'var(--blue)'}">${t.label||id}
-      <button type="button" onclick="removeFormTag(${i})">×</button></span>`;
-  }).join('') || '<span class="hint">Ninguna etiqueta</span>';
-}
-function addSelectedTagToProduct(){
-  const sel = document.getElementById('pTagSelect');
-  const id = sel && sel.value;
-  if(!id) return;
-  if(formTags.indexOf(id) >= 0) return;
-  formTags.push(id);
-  renderFormTagChips();
-  if(sel) sel.value = '';
-}
-function removeFormTag(i){
-  formTags.splice(i,1);
-  renderFormTagChips();
-}
-async function addExtraTag(){
-  const label = (document.getElementById('tagNewLabel')||{}).value.trim();
-  const color = (document.getElementById('tagNewColor')||{}).value || '#00b4ff';
-  if(!label){ alert('Escribe el nombre de la etiqueta'); return; }
-  ensureExtraTags();
-  const id = label.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || ('tag'+Date.now());
-  if((data.extraTags||[]).some(t => t.id===id || (t.label||'').toLowerCase()===label.toLowerCase())){
-    alert('Esa etiqueta ya existe'); return;
-  }
-  data.extraTags.push({id, label, color});
-  try{
-    await db.ref('extraTags').set(data.extraTags);
-  }catch(e){ console.warn(e); }
-  document.getElementById('tagNewLabel').value = '';
-  renderTagsAdmin();
-}
-async function removeExtraTag(i){
-  ensureExtraTags();
-  const t = data.extraTags[i];
-  if(!t) return;
-  if(!confirm('¿Quitar etiqueta "'+(t.label||t.id)+'" del catálogo? (no borra productos)')) return;
-  data.extraTags.splice(i,1);
-  try{ await db.ref('extraTags').set(data.extraTags); }catch(e){}
-  formTags = formTags.filter(x => x !== t.id);
-  renderTagsAdmin();
-  renderFormTagChips();
-}
-
-
 function renderProductsAdmin(){
-  ensureExtraTags();
-  const q = ((document.getElementById('adminSearch')||{}).value||'').toLowerCase().trim();
-  const list = (data.products||[]).filter(p=>{
-    if(!q) return true;
-    const blob = ((p.name||'')+' '+(p.codigo||'')+' '+(p.cat||'')+' '+(p.desc||'')+' '+(productTags(p).join(' '))).toLowerCase();
-    return blob.includes(q);
-  });
-  const el = document.getElementById("productsAdminList");
-  if(!el) return;
-  el.innerHTML = list.length ? list.map(p=>{
-    const tagsHtml = productTags(p).map(id=>{
-      const t=tagMeta(id);
-      return `<span class="tag-chip" style="font-size:10px;border-color:${t.color||'var(--blue)'};color:${t.color||'var(--blue)'}">${t.label||id}</span>`;
-    }).join(' ');
-    return `<div class="product-admin">
-      <img src="${p.img||''}" onerror="this.style.opacity='0.25'">
-      <div class="meta"><strong>${p.name||''}</strong>
-        ${p.codigo?` <small style="color:var(--blue)">[${p.codigo}]</small>`:''}
-        <br><small>${p.cat||''} · ${p.available?'Disponible':'Agotado'}</small>
-        <div style="margin-top:4px">${tagsHtml}</div>
-      </div>
-      <div class="actions">
-        <button class="btn primary" onclick="editProduct(${p.id})">Editar</button>
-        <button class="btn secondary" onclick="deleteProduct(${p.id})">Borrar</button>
-      </div>
-    </div>`;
-  }).join('') : '<p class="hint">Sin productos'+(q?' (filtro)':'')+'</p>';
-  renderTagsAdmin();
+  document.getElementById("productsAdminList").innerHTML=data.products.map(p=>`
+    <div class="admin-item"><img src="${p.img}" onerror="this.style.opacity='0.25'">
+    <div><strong>${p.name}</strong>${p.codigo?` <small style="color:var(--blue)">[${p.codigo}]</small>`:""}<br><small>${p.cat} | ${p.available?"Disponible":"Agotado"}</small></div>
+    <div class="actions"><button class="btn primary" onclick="editProduct(${p.id})">Editar</button>
+    <button class="btn secondary" onclick="deleteProduct(${p.id})">Borrar</button></div></div>`).join("");
 }
 
 document.getElementById("prodName")?.addEventListener("input",()=>updateProdPreview());
@@ -1224,24 +927,15 @@ function updateProdPreview(imgSrc){
 function editProduct(id){
   const p=data.products.find(x=>x.id===id);if(!p)return;
   editingProdId=id;
-  document.getElementById("prodName").value=p.name||"";
+  document.getElementById("prodName").value=p.name;
   document.getElementById("prodCodigo").value=p.codigo||"";
-  document.getElementById("prodCat").value=p.cat||"otros";
+  document.getElementById("prodCat").value=p.cat;
   document.getElementById("prodDesc").value=p.desc||"";
   document.getElementById("prodStock").checked=!!p.available;
   const iu=document.getElementById("prodImgUrl"); if(iu)iu.value=(p.img&&String(p.img).indexOf("http")===0)?p.img:"";
-  formTags = productTags(p).slice();
-  fillTagSelect();
-  renderFormTagChips();
   updateProdPreview(p.img);
-  const ft=document.getElementById('formTitle'); if(ft) ft.textContent='✏️ Editar producto';
   showAdminTab("productosAdmin");
-  try{
-    document.querySelectorAll(".admin-tab").forEach(t=>t.classList.remove('active'));
-    const tab=[...document.querySelectorAll('.admin-tab')].find(b=>/producto/i.test(b.textContent||''));
-    if(tab) tab.classList.add('active');
-  }catch(e){}
-  try{ document.querySelector('.admin-form-box')?.scrollIntoView({behavior:'smooth',block:'start'}); }catch(e){}
+  document.querySelectorAll(".admin-tab")[1]?.classList.add("active");
 }
 
 function normImgUrlCat(u){
@@ -1287,7 +981,7 @@ async function saveProduct(){
     if(!img)img=editingProdId?(data.products.find(p=>p.id===id)?.img||""):"";
     if(img&&img.indexOf("data:")===0)img="";
     if(!img)img="";
-    const prod={id,name,codigo,cat,desc,img,available,tags:formTags.slice()};
+    const prod={id,name,codigo,cat,desc,img,available};
     await db.ref("products/"+id).set(prod);
     const i=data.products.findIndex(p=>p.id===id);
     if(i>=0)data.products[i]=prod;else data.products.unshift(prod);
@@ -1303,12 +997,6 @@ function clearProdForm(){
   document.getElementById("prodDesc").value="";
   const iu=document.getElementById("prodImgUrl"); if(iu)iu.value="";
   document.getElementById("prodStock").checked=true;
-  try{ document.getElementById("prodCat").value="herramientas"; }catch(e){}
-  formTags=[];
-  fillTagSelect();
-  renderFormTagChips();
-  const ft=document.getElementById('formTitle'); if(ft) ft.textContent='➕ Agregar producto';
-  updateProdPreview("");
   document.getElementById("previewProd").innerHTML="";
 }
 
