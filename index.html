@@ -4,6 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ATCB Oficial | Refrigeración Comercial e Industrial</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#0b0f14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ATCB">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="ATCB">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <link rel="icon" href="images/logo.png">
 <meta name="description" content="Luis Bonilla - Técnico en refrigeración comercial e industrial. Cuartos fríos, neveras exhibidoras, fabricación y servicio técnico. @AtcbOficial">
 <meta property="og:type" content="website">
@@ -1429,6 +1439,14 @@ document.addEventListener("DOMContentLoaded",async()=>{
   catch(e){console.error(e);alert("Error Firebase: "+e.message+". Crea Realtime Database y revisa las reglas.")}
   showLoading(false);
 });
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('./sw.js').catch(function (e) { console.warn('[PWA]', e); });
+  });
+}
 </script>
 </body>
 </html>
