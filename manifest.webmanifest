@@ -1,10 +1,11 @@
 {
   "name": "AtcbOficial Catalogo",
   "short_name": "AtcbOficial Catalogo",
-  "description": "🧊 AtcbOficial Catalogo · Refrigeración Comercial Industrial",
+  "description": "AtcbOficial Catalogo",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#080c14",
   "theme_color": "#080c14",
   "lang": "es",
@@ -16,10 +17,22 @@
       "purpose": "any"
     },
     {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
       "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
