@@ -1,30 +1,36 @@
 <!DOCTYPE html>
+<!--
+  PROYECTO: 🧊 AtcbOficial Catalogo
+  Descripción: Refrigeración Comercial Industrial
+  Catálogo público de la empresa 🧊 AtcbOficial
+  (proyecto base: 👨‍💼 Luis Jose Bonilla & Empresas)
+-->
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ATCB Oficial | Refrigeración Comercial e Industrial</title>
+<title>🧊 AtcbOficial Catalogo</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="theme-color" content="#0b0f14">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="ATCB">
+<meta name="apple-mobile-web-app-title" content="AtcbOficial Catalogo">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="application-name" content="ATCB">
+<meta name="application-name" content="AtcbOficial Catalogo">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <link rel="icon" href="images/logo.png">
 <meta name="description" content="Luis Bonilla - Técnico en refrigeración comercial e industrial. Cuartos fríos, neveras exhibidoras, fabricación y servicio técnico. @AtcbOficial">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://atcboficial.github.io/AtcbOficial/">
-<meta property="og:title" content="ATCB Oficial | Refrigeración Comercial e Industrial">
+<meta property="og:title" content="🧊 AtcbOficial Catalogo · Refrigeración Comercial Industrial">
 <meta property="og:description" content="Luis Bonilla - Técnico en refrigeración comercial e industrial. Cuartos fríos, neveras exhibidoras, fabricación y servicio técnico.">
 <meta property="og:image" content="https://atcboficial.github.io/AtcbOficial/images/og-share.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="ATCB Oficial | Refrigeración Comercial e Industrial">
+<meta name="twitter:title" content="🧊 AtcbOficial Catalogo · Refrigeración Comercial Industrial">
 <meta name="twitter:description" content="Luis Bonilla - Técnico en refrigeración comercial e industrial. Cuartos fríos, neveras exhibidoras y servicio técnico.">
 <meta name="twitter:image" content="https://atcboficial.github.io/AtcbOficial/images/og-share.jpg">
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
@@ -592,83 +598,62 @@ async function importFromControlJSON(){
   const st = document.getElementById('importControlStatus');
   const setSt = (t) => { if(st) st.textContent = t; };
   if(!input || !input.files || !input.files[0]){ alert('Elige el archivo JSON exportado desde Control'); return; }
+  // No bloquear toda la UI con "Cargando..."; solo el estado del import
   try{
     const textJson = await input.files[0].text();
     const dataIn = JSON.parse(textJson);
     const items = Array.isArray(dataIn.items) ? dataIn.items : (Array.isArray(dataIn) ? dataIn : []);
     if(!items.length){ alert('El JSON no trae productos (items)'); return; }
-
-    data.products = data.products || [];
     let created=0, updated=0, skipped=0;
-    const updates = {}; // multipath RTDB
-
     for(let i=0;i<items.length;i++){
       const it = items[i]||{};
       const codigo = normCodigo(it.codigo||it.code||'');
       const nombre = String(it.nombre||it.name||'').trim();
-      let imgData = (typeof it.img==='string' && it.img.indexOf('http')===0) ? it.img : '';
-      if(imgData.indexOf('data:')===0) imgData = '';
+      const imgData = (typeof it.img==='string' && it.img.indexOf('http')===0) ? it.img : '';
       if(!codigo){ skipped++; continue; }
       if(!nombre && !imgData){ skipped++; continue; }
-      setSt('Preparando '+(i+1)+'/'+items.length+' · '+codigo);
-
-      const found = data.products.find(p => normCodigo(p.codigo)===normCodigo(codigo));
+      setSt('Procesando '+(i+1)+'/'+items.length+' · '+codigo);
+      // Dar un tick al UI para que se vea el estado
+      await new Promise(r => setTimeout(r, 0));
+      const found = (data.products||[]).find(p => normCodigo(p.codigo)===normCodigo(codigo));
+      // Imagen: guardar dataURL directo (rápido y fiable). Storage es opcional.
+      let img = imgData || '';
+      if(img.indexOf('data:')===0) img = ''; // no base64 en catálogo/Firebase
       if(found){
         const id = found.id;
-        let img = imgData || ((found.img && String(found.img).indexOf('http')===0) ? found.img : '');
-        const patch = { name: nombre || found.name, codigo: codigo };
+        if(!img) img = (found.img && String(found.img).indexOf('http')===0) ? found.img : '';
+        // Solo nombre + imagen (+ código). NO tocar etiquetas, cat, desc, available, etc.
+        const patch = {
+          name: nombre || found.name,
+          codigo: codigo
+        };
         if (img) patch.img = img;
-        Object.keys(patch).forEach(k => { updates['products/'+id+'/'+k] = patch[k]; });
+        await db.ref('products/'+id).update(patch);
         const ix = data.products.findIndex(p=>p.id===id);
-        if(ix>=0) data.products[ix] = Object.assign({}, data.products[ix], patch);
-        else data.products.unshift(Object.assign({}, found, patch));
+        if(ix>=0){
+          data.products[ix] = Object.assign({}, data.products[ix], patch);
+          // conservar tags y resto de campos locales
+        } else {
+          data.products.unshift(Object.assign({}, found, patch));
+        }
         updated++;
       } else {
         const id = Date.now()+i;
         const prod = {
-          id, name: nombre || codigo, codigo: codigo,
-          cat: 'otros', desc: '', img: imgData || '', available: true, tags: []
+          id,
+          name: nombre || codigo,
+          codigo: codigo,
+          cat: 'otros',
+          desc: '',
+          img: img || '',
+          available: true,
+          tags: []
         };
-        updates['products/'+id] = prod;
+        await db.ref('products/'+id).set(prod);
         data.products.unshift(prod);
         created++;
       }
     }
-
-    setSt('Guardando en Firebase… ('+Object.keys(updates).length+' cambios)');
-    try {
-      // Una sola escritura multipath (menos fallos / más rápido)
-      await db.ref().update(updates);
-    } catch (e1) {
-      const m1 = String(e1 && (e1.message||e1.code||e1));
-      if (/PERMISSION_DENIED|permission_denied|Permission denied/i.test(m1)) {
-        throw new Error('PERMISSION_DENIED: Firebase bloqueó la escritura. Abre Firebase Console → Realtime Database → Reglas y permite .write en /products (o { ".read": true, ".write": true }). Publica y vuelve a importar.');
-      }
-      console.warn('[import] multipath falló, reintento por lotes', e1);
-      const keys = Object.keys(updates);
-      const BATCH = 40;
-      for (let b = 0; b < keys.length; b += BATCH) {
-        const chunk = {};
-        keys.slice(b, b+BATCH).forEach(k => { chunk[k] = updates[k]; });
-        setSt('Guardando lote '+(Math.floor(b/BATCH)+1)+'…');
-        try {
-          await db.ref().update(chunk);
-        } catch (e2) {
-          const msg = String(e2 && (e2.message||e2.code||e2));
-          if (/PERMISSION_DENIED|permission_denied|Permission denied/i.test(msg)) {
-            throw new Error(
-              'PERMISSION_DENIED: Firebase bloqueó la escritura.\n\n' +
-              'En Firebase Console → Realtime Database → Reglas, permite escritura, por ejemplo:\n' +
-              '{ "rules": { ".read": true, ".write": true } }\n\n' +
-              '(O al menos .write en /products). Publica las reglas y vuelve a importar.'
-            );
-          }
-          throw e2;
-        }
-        await new Promise(r => setTimeout(r, 30));
-      }
-    }
-
     renderProductsAdmin();
     try{ if(typeof renderProducts==='function') renderProducts(); }catch(e){}
     input.value = '';
@@ -677,9 +662,8 @@ async function importFromControlJSON(){
     alert(msg);
   }catch(e){
     console.error(e);
-    const msg = (e && e.message) ? e.message : String(e);
-    setSt('Error: '+msg);
-    alert('Error al importar: '+msg);
+    setSt('Error: '+(e.message||e));
+    alert('Error al importar: '+(e.message||e));
   }
 }
 
