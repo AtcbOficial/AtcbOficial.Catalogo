@@ -326,7 +326,13 @@ body.skin-navidad .cat-btn.active{background:#2e7d32!important;color:#fff!import
     dots.appendChild(d); } }
   var done=false;
   function hide(){ if(done) return; done=true; s.classList.add('hide');
-    setTimeout(function(){ try{ s.remove(); }catch(e){} }, 600); }
+    setTimeout(function(){ try{ s.remove(); }catch(e){}
+      window.__atcbSplashDone = true;
+      if (window.__atcbWelcomePending && typeof maybeShowWelcome === 'function') {
+        window.__atcbWelcomePending = false;
+        try { maybeShowWelcome(); } catch(err) {}
+      }
+    }, 500); }
   // ~3 seconds visible
   setTimeout(hide, 3000);
   window.addEventListener('load', function(){ setTimeout(hide, 3200); });
@@ -396,7 +402,10 @@ body.skin-navidad .cat-btn.active{background:#2e7d32!important;color:#fff!import
     <button class="cat-btn" data-cat="herramientas">Herramientas</button>
     <button class="cat-btn" data-cat="otros">Otros</button>
   </div>
-  <div class="products" id="productsGrid"></div>
+  <div class="search-bar" style="margin:0 0 12px;padding:0 4px">
+      <input type="search" id="catSearch" placeholder="🔍 Buscar por nombre o código id..." oninput="renderProducts()" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(0,180,255,.25);background:var(--card);color:var(--text);font-size:14px">
+    </div>
+    <div class="products" id="productsGrid"></div>
 </section>
 <section id="carrito" class="section">
   <h1 class="section-title">Tu Carrito</h1>
@@ -835,11 +844,15 @@ function renderSkinFx(name){
   }
 }
 
+window.__atcbSplashDone = false;
+window.__atcbWelcomePending = false;
 function maybeShowWelcome(){
   if (!data.welcomeBannerOn) return;
   const url = data.welcomeBannerUrl || '';
   if (!url || url.indexOf('http')!==0) return;
   if (sessionStorage.getItem('atcb_welcome_seen')) return;
+  /* Esperar a que termine el splash de inicio */
+  if (!window.__atcbSplashDone) { window.__atcbWelcomePending = true; return; }
   const img = document.getElementById('welcomeBannerImg');
   const box = document.getElementById('welcomeBanner');
   if (img) img.src = url;
@@ -987,8 +1000,18 @@ document.getElementById("catFilters").addEventListener("click",e=>{
 
 function renderProducts(){
   const grid=document.getElementById("productsGrid");
-  const filtered=currentCat==="all"?data.products:data.products.filter(p=>p.cat===currentCat);
+  if(!grid)return;
+  const q=((document.getElementById("catSearch")||{}).value||"").toLowerCase().trim();
+  let filtered=(data.products||[]).filter(p=>p.available!==false);
+  if(q){
+    filtered=filtered.filter(p=>{
+      const name=(p.name||"").toLowerCase();
+      const cod=String(p.codigo||p.code||"").toLowerCase();
+      return name.includes(q)||cod.includes(q);
+    });
+  }
   if(!filtered.length){grid.innerHTML='<p style="text-align:center;color:var(--muted);grid-column:1/-1">No hay productos.</p>';return}
+  grid.innerHTML='<p style="text-align:center;color:var(--muted);grid-column:1/-1">No hay productos.</p>';return}
   grid.innerHTML=filtered.map(p=>`
     <div class="product-card">
       <img src="${p.img}" alt="${p.name}" onerror="this.style.opacity='0.25'">
