@@ -1002,7 +1002,10 @@ function renderProducts(){
   const grid=document.getElementById("productsGrid");
   if(!grid)return;
   const q=((document.getElementById("catSearch")||{}).value||"").toLowerCase().trim();
-  let filtered=(data.products||[]).filter(p=>p.available!==false);
+  let filtered=(data.products||[]).slice();
+  if(typeof currentCat!=='undefined' && currentCat && currentCat!=='all'){
+    filtered=filtered.filter(p=>p.cat===currentCat);
+  }
   if(q){
     filtered=filtered.filter(p=>{
       const name=(p.name||"").toLowerCase();
@@ -1011,7 +1014,6 @@ function renderProducts(){
     });
   }
   if(!filtered.length){grid.innerHTML='<p style="text-align:center;color:var(--muted);grid-column:1/-1">No hay productos.</p>';return}
-  grid.innerHTML='<p style="text-align:center;color:var(--muted);grid-column:1/-1">No hay productos.</p>';return}
   grid.innerHTML=filtered.map(p=>`
     <div class="product-card">
       <img src="${p.img}" alt="${p.name}" onerror="this.style.opacity='0.25'">
