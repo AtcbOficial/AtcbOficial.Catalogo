@@ -1,0 +1,20 @@
+# Estructura de imágenes (PNG)
+
+Coloca en cada repositorio:
+
+```
+/
+  index.html
+  manifest.webmanifest
+  sw.js
+  icon-192.png
+  icon-512.png
+  apple-touch-icon.png
+  splash-logo.png
+  images/
+    og-share.png
+    Banner de bienvenida/
+      banner_bienvenida.png
+```
+
+Preferir siempre `.png` en links públicos (GitHub raw o GitHub Pages).

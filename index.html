@@ -26,13 +26,14 @@
 <meta property="og:url" content="https://atcboficial.github.io/AtcbOficial/">
 <meta property="og:title" content="🧊 AtcbOficial Catalogo · Refrigeración Comercial Industrial">
 <meta property="og:description" content="Luis Bonilla - Técnico en refrigeración comercial e industrial. Cuartos fríos, neveras exhibidoras, fabricación y servicio técnico.">
-<meta property="og:image" content="https://atcboficial.github.io/AtcbOficial/images/og-share.jpg">
+<meta property="og:image" content="https://atcboficial.github.io/AtcbOficial.Catalogo/images/og-share.png">
+<meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="🧊 AtcbOficial Catalogo · Refrigeración Comercial Industrial">
 <meta name="twitter:description" content="Luis Bonilla - Técnico en refrigeración comercial e industrial. Cuartos fríos, neveras exhibidoras y servicio técnico.">
-<meta name="twitter:image" content="https://atcboficial.github.io/AtcbOficial/images/og-share.jpg">
+<meta name="twitter:image" content="https://atcboficial.github.io/AtcbOficial.Catalogo/images/og-share.png">
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
@@ -416,6 +417,18 @@ body.skin-navidad .cat-btn.active{background:#2e7d32!important;color:#fff!import
   </div>
 </section>
 <section id="admin" class="section">
+<div id="cloudBackupBox" class="card" style="margin:12px 0;padding:12px;border:1px solid var(--blue,#4da3ff);border-radius:12px">
+  <div style="font-weight:700;margin-bottom:6px">☁️ Firebase (nube) y sus herramientas</div>
+  <p style="font-size:12px;color:var(--muted);margin:0 0 8px">Respaldo completo del catálogo: productos, galería, redes, banner y ajustes. Formato JSON. Imágenes como links https (.png preferido).</p>
+  <p id="cloudBackupStatus" style="font-size:12px;margin:0 0 8px;color:var(--muted)">Listo</p>
+  <div style="display:grid;gap:8px">
+    <button type="button" class="btn primary" id="btnCatCloudExport">⬇️ Firebase → JSON (respaldo total)</button>
+    <button type="button" class="btn" id="btnCatCloudImport">⬆️ JSON → Firebase (restaurar)</button>
+    <button type="button" class="btn" id="btnCatCloudReload">☁️ Recargar desde Firebase</button>
+  </div>
+  <input type="file" id="catCloudImportFile" accept="application/json,.json" style="display:none">
+</div>
+
   <div id="adminLogin">
     <h2>Acceso Admin</h2>
     <input type="password" id="adminPass" placeholder="Clave">
@@ -1526,5 +1539,72 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
+
+<script>
+/* === ☁️ Respaldo total Firebase (catálogo ATCB) === */
+(function(){
+  function setSt(msg){ var el=document.getElementById('cloudBackupStatus'); if(el) el.textContent=msg||''; }
+  async function exportFull(){
+    try {
+      setSt('Leyendo Firebase…');
+      if (typeof db==='undefined' || !db) { setSt('Firebase no listo'); alert('Firebase no listo'); return; }
+      var snap = await db.ref('/').once('value');
+      var val = snap.val() || {};
+      var payload = {
+        app: 'AtcbOficial-Catalogo',
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        firebaseRoot: val
+      };
+      var blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'AtcbOficial-Catalogo-respaldo-'+Date.now()+'.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+      setSt('Respaldo descargado · '+new Date().toLocaleString());
+    } catch(e){ console.error(e); setSt('Error: '+(e.message||e)); alert('Error: '+(e.message||e)); }
+  }
+  async function importFull(file){
+    if(!file) return;
+    if(!confirm('¿Restaurar este JSON en Firebase? Sobrescribirá productos/galería/ajustes del catálogo.')) return;
+    try {
+      setSt('Restaurando…');
+      var text = await file.text();
+      var obj = JSON.parse(text);
+      var root = obj.firebaseRoot || obj;
+      if (root.firebaseRoot) root = root.firebaseRoot;
+      delete root.app; delete root.version; delete root.exportedAt;
+      await db.ref('/').update(root);
+      if (typeof loadData==='function') await loadData();
+      if (typeof renderProducts==='function') renderProducts();
+      if (typeof renderProductsAdmin==='function') renderProductsAdmin();
+      setSt('Restaurado · '+new Date().toLocaleString());
+      alert('Catálogo restaurado desde JSON');
+    } catch(e){ console.error(e); setSt('Error: '+(e.message||e)); alert('Error: '+(e.message||e)); }
+  }
+  async function reloadCloud(){
+    try {
+      setSt('Recargando…');
+      if (typeof loadData==='function') await loadData();
+      if (typeof renderProducts==='function') renderProducts();
+      if (typeof renderProductsAdmin==='function') renderProductsAdmin();
+      setSt('Recargado · '+new Date().toLocaleString());
+    } catch(e){ setSt('Error: '+(e.message||e)); }
+  }
+  function bind(){
+    var b1=document.getElementById('btnCatCloudExport');
+    var b2=document.getElementById('btnCatCloudImport');
+    var b3=document.getElementById('btnCatCloudReload');
+    var fi=document.getElementById('catCloudImportFile');
+    if(b1) b1.onclick=exportFull;
+    if(b3) b3.onclick=reloadCloud;
+    if(b2&&fi){ b2.onclick=function(){ fi.click(); }; fi.onchange=function(){ importFull(fi.files&&fi.files[0]); fi.value=''; }; }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', bind);
+  else bind();
+})();
+</script>
+
 </body>
 </html>
