@@ -348,15 +348,16 @@ body.skin-navidad .cat-btn.active{background:#2e7d32!important;color:#fff!import
 <div id="skinFx" aria-hidden="true"></div>
 <div id="fbLoading"><div class="spinner"></div><p>Cargando...</p></div>
 <header>
-  <div class="logo-area" onclick="showSection('inicio')">
-    <img id="siteLogo" src="images/logo.png" alt="Logo ATCB" class="logo">
-    <span class="brand" id="siteBrand">@AtcbOficial</span>
+  <div class="logo-area">
+    <img id="siteLogo" src="images/logo.png" alt="Logo ATCB" class="logo" onclick="showSection('inicio')" style="cursor:pointer">
+    <span class="brand" id="siteBrand" style="cursor:pointer;user-select:none">@AtcbOficial</span>
     <div class="header-social" id="headerSocial"></div>
   </div>
   <nav id="mainNav">
     <button onclick="showSection('inicio')" class="nav-btn active" data-sec="inicio">Inicio</button>
     <button onclick="showSection('catalogo')" class="nav-btn" data-sec="catalogo">Catálogo</button>
     <button onclick="showSection('carrito')" class="nav-btn" data-sec="carrito" id="cartNavBtn">Carrito <span id="cartCount">0</span></button>
+    <button type="button" class="nav-btn" id="navAdmin" data-sec="admin" onclick="showSection('admin')" style="display:none">⚙️ Panel</button>
   </nav>
 </header>
 <main>
@@ -433,7 +434,7 @@ body.skin-navidad .cat-btn.active{background:#2e7d32!important;color:#fff!import
     <button type="button" class="btn" id="btnCatCloudImport">⬆️ JSON → Firebase (restaurar)</button>
     <button type="button" class="btn" id="btnCatCloudReload">☁️ Recargar desde Firebase</button>
   </div>
-  <input type="file" id="catCloudImportFile" accept="application/json,.json" style="display:block">
+  <input type="file" id="catCloudImportFile" accept="application/json,.json" style="display:none!important;position:absolute;width:0;height:0;opacity:0;pointer-events:none" style="display:block">
 </div>
 
   
@@ -1631,5 +1632,52 @@ if ('serviceWorker' in navigator) {
 })();
 </script>
 
+
+<script>
+/* Acceso admin: 10 toques en @AtcbOficial */
+(function(){
+  var taps = 0, tmr = null;
+  function revealAdminNav(show){
+    var btn = document.getElementById('navAdmin');
+    if (btn) btn.style.display = show ? '' : 'none';
+  }
+  window.revealAdminNav = revealAdminNav;
+  function onBrandTap(e){
+    if (e) { e.preventDefault(); e.stopPropagation(); }
+    taps++;
+    if (tmr) clearTimeout(tmr);
+    tmr = setTimeout(function(){ taps = 0; }, 2500);
+    if (taps >= 10) {
+      taps = 0;
+      try { sessionStorage.setItem('atcb_admin', '1'); } catch(err){}
+      revealAdminNav(true);
+      if (typeof showSection === 'function') showSection('admin');
+      if (typeof toast === 'function') toast('Panel admin');
+      else alert('Panel admin');
+    }
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    var brand = document.getElementById('siteBrand');
+    if (brand) {
+      brand.addEventListener('click', onBrandTap);
+      brand.addEventListener('touchend', function(e){ onBrandTap(e); }, {passive:false});
+    }
+    try {
+      if (sessionStorage.getItem('atcb_admin') === '1') revealAdminNav(true);
+    } catch(err){}
+  });
+  // al cerrar sesión admin
+  var _logout = window.logoutAdmin;
+  window.logoutAdmin = function(){
+    try { sessionStorage.removeItem('atcb_admin'); } catch(e){}
+    revealAdminNav(false);
+    if (typeof _logout === 'function') return _logout.apply(this, arguments);
+    try {
+      document.getElementById('adminPanel').style.display = 'none';
+      document.getElementById('adminLogin').style.display = 'block';
+    } catch(e){}
+  };
+})();
+</script>
 </body>
 </html>
