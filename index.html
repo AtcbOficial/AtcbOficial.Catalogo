@@ -23,17 +23,17 @@
 <link rel="icon" href="images/logo.png">
 <meta name="description" content="Luis Bonilla - Técnico en refrigeración comercial e industrial. Cuartos fríos, neveras exhibidoras, fabricación y servicio técnico. @AtcbOficial">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://atcboficial.github.io/AtcbOficial/">
+<meta property="og:url" content="https://atcboficial.github.io/AtcbOficial-Catalogo/">
 <meta property="og:title" content="🧊 AtcbOficial Catalogo · Refrigeración Comercial Industrial">
 <meta property="og:description" content="Luis Bonilla - Técnico en refrigeración comercial e industrial. Cuartos fríos, neveras exhibidoras, fabricación y servicio técnico.">
-<meta property="og:image" content="https://atcboficial.github.io/AtcbOficial.Catalogo/images/og-share.png">
+<meta property="og:image" content="https://atcboficial.github.io/AtcbOficial-Catalogo/images/og-share.png">
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="🧊 AtcbOficial Catalogo · Refrigeración Comercial Industrial">
 <meta name="twitter:description" content="Luis Bonilla - Técnico en refrigeración comercial e industrial. Cuartos fríos, neveras exhibidoras y servicio técnico.">
-<meta name="twitter:image" content="https://atcboficial.github.io/AtcbOficial.Catalogo/images/og-share.png">
+<meta name="twitter:image" content="https://atcboficial.github.io/AtcbOficial-Catalogo/images/og-share.png">
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-storage-compat.js"></script>
@@ -417,7 +417,14 @@ body.skin-navidad .cat-btn.active{background:#2e7d32!important;color:#fff!import
   </div>
 </section>
 <section id="admin" class="section">
-<div id="cloudBackupBox" class="card" style="margin:12px 0;padding:12px;border:1px solid var(--blue,#4da3ff);border-radius:12px">
+<div id="adminLogin">
+    <h2>Acceso Admin</h2>
+    <input type="password" id="adminPass" placeholder="Clave">
+    <button class="btn primary" onclick="loginAdmin()">Entrar</button>
+    <p class="hint">Clave por defecto: atcb2024</p>
+  </div>
+  <div id="adminPanel" style="display:none">
+<div id="cloudBackupBox" class="card admin-only-cloud" style="display:none;margin:12px 0;padding:12px;border:1px solid var(--blue,#4da3ff);border-radius:12px">
   <div style="font-weight:700;margin-bottom:6px">☁️ Firebase (nube) y sus herramientas</div>
   <p style="font-size:12px;color:var(--muted);margin:0 0 8px">Respaldo completo del catálogo: productos, galería, redes, banner y ajustes. Formato JSON. Imágenes como links https (.png preferido).</p>
   <p id="cloudBackupStatus" style="font-size:12px;margin:0 0 8px;color:var(--muted)">Listo</p>
@@ -426,16 +433,11 @@ body.skin-navidad .cat-btn.active{background:#2e7d32!important;color:#fff!import
     <button type="button" class="btn" id="btnCatCloudImport">⬆️ JSON → Firebase (restaurar)</button>
     <button type="button" class="btn" id="btnCatCloudReload">☁️ Recargar desde Firebase</button>
   </div>
-  <input type="file" id="catCloudImportFile" accept="application/json,.json" style="display:none">
+  <input type="file" id="catCloudImportFile" accept="application/json,.json" style="display:block">
 </div>
 
-  <div id="adminLogin">
-    <h2>Acceso Admin</h2>
-    <input type="password" id="adminPass" placeholder="Clave">
-    <button class="btn primary" onclick="loginAdmin()">Entrar</button>
-    <p class="hint">Clave por defecto: atcb2024</p>
-  </div>
-  <div id="adminPanel" style="display:none">
+  
+
     <h1>Panel de Administración</h1>
     <button class="btn secondary" onclick="logoutAdmin()">Cerrar Sesión</button>
     <div class="admin-tabs">
@@ -1603,6 +1605,29 @@ if ('serviceWorker' in navigator) {
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', bind);
   else bind();
+})();
+</script>
+
+
+<script>
+(function(){
+  function showCloudBackup(on){
+    var el=document.getElementById('cloudBackupBox');
+    if(el) el.style.display = on ? '' : 'none';
+  }
+  window.showCloudBackup = showCloudBackup;
+  // try bind to existing admin flow
+  var _orig = window.openAdmin || window.showAdminPanel || null;
+  document.addEventListener('DOMContentLoaded', function(){
+    // if admin section becomes visible, show cloud box when password gate hidden
+    var obs = new MutationObserver(function(){
+      var login = document.getElementById('adminLogin') || document.querySelector('.admin-login');
+      var admin = document.getElementById('admin');
+      if(login && login.style && login.style.display==='none') showCloudBackup(true);
+    });
+    var admin = document.getElementById('admin');
+    if(admin) obs.observe(admin, {attributes:true, subtree:true, attributeFilter:['style','class']});
+  });
 })();
 </script>
 
